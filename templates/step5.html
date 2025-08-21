@@ -1,0 +1,432 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Complaints - Step 5 - Care Diagnostics{% endblock %}
+
+{% block content %}
+<div class="step-container">
+    <div class="step-header">
+        <h2><i class="fas fa-comment-medical"></i> Step 5: Describe Your Symptoms</h2>
+        <p>Please describe your current symptoms or health concerns in your own words. Our AI will analyze your description to better understand your condition.</p>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 83.33%"></div>
+        </div>
+    </div>
+
+    <!-- Abnormal Findings Section -->
+    {% if abnormal_findings %}
+    <div class="form-section abnormal-findings-section">
+        <h3><i class="fas fa-exclamation-triangle"></i> Abnormal Findings Detected</h3>
+        <div class="alert alert-warning">
+            <i class="fas fa-info-circle"></i>
+            <strong>Based on your vital signs and medical data, we detected the following abnormal findings:</strong>
+        </div>
+        
+        <div class="abnormal-findings-grid">
+            {% for finding in abnormal_findings %}
+            <div class="finding-card {{ finding.priority }}">
+                <div class="finding-header">
+                    <span class="priority-badge priority-{{ finding.priority }}">
+                        {% if finding.priority == 'critical' %}
+                            <i class="fas fa-exclamation-circle"></i> Critical
+                        {% elif finding.priority == 'abnormal' %}
+                            <i class="fas fa-exclamation-triangle"></i> Abnormal
+                        {% else %}
+                            <i class="fas fa-info-circle"></i> Note
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="finding-content">
+                    <h4>{{ finding.finding }}</h4>
+                    {% if finding.concern %}
+                        <p class="medical-concern">
+                            <strong>Medical Concern:</strong> {{ finding.concern|title }}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="findings-note">
+            <p><strong>Please note:</strong> When describing your symptoms below, consider mentioning any symptoms related to these findings to help us provide a more accurate assessment.</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <form id="complaints-form" class="medical-form">
+        <div class="form-section">
+            <h3><i class="fas fa-edit"></i> Your Health Concerns</h3>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <strong>Please be detailed:</strong> Describe your symptoms, when they started, how severe they are, what makes them better or worse, and any other relevant details.
+            </div>
+            
+            <div class="form-group">
+                <label for="complaint_text">
+                    <strong>Describe your current symptoms or health concerns:</strong>
+                    <span class="required-indicator">*</span>
+                </label>
+                <textarea 
+                    id="complaint_text" 
+                    name="complaint_text" 
+                    rows="8" 
+                    placeholder="Please describe in detail:
+• What symptoms are you experiencing?
+• When did they start?
+• How severe are they (mild, moderate, severe)?
+• What makes them better or worse?
+• Any associated symptoms?
+• How are they affecting your daily life?
+
+Example: 'I have been experiencing severe headaches for the past 3 days. They start in the morning and get worse throughout the day. The pain is throbbing and located mainly on the right side of my head. Bright lights make it worse, and lying down in a dark room helps a little. I also feel nauseous and have been having trouble sleeping.'"
+                    required
+                    maxlength="2000">{{ step5_data.get('complaint_text', '') }}</textarea>
+                <small class="form-note">Be as specific as possible - this helps our AI provide better analysis</small>
+                <div class="character-counter">
+                    <span id="char-count">0</span>/2000 characters
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Insights Section -->
+        <div class="form-section">
+            <div class="quick-insights-container">
+                <button type="button" id="quick-insights-btn" class="btn btn-info">
+                    <i class="fas fa-brain"></i> Get Quick Insights
+                </button>
+                <p class="insights-help">Click to get AI analysis of your symptoms</p>
+            </div>
+            
+            <!-- Insights Display Area -->
+            <div id="insights-display" class="insights-container" style="display: none;">
+                <!-- Medical Labels will be displayed here -->
+                <div id="medical-labels-display"></div>
+                
+                <!-- Submit button appears after insights -->
+                <div class="submit-container" style="margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-arrow-right"></i> Submit Symptoms & Continue
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="loading-container" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p>Analyzing your symptoms...</p>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Character counter
+document.getElementById('complaint_text').addEventListener('input', function() {
+    const charCount = this.value.length;
+    document.getElementById('char-count').textContent = charCount;
+    
+    const counter = document.getElementById('char-count');
+    if (charCount > 1800) {
+        counter.style.color = '#e74c3c';
+    } else if (charCount > 1500) {
+        counter.style.color = '#f39c12';
+    } else {
+        counter.style.color = '#27ae60';
+    }
+});
+
+// Quick Insights functionality
+document.getElementById('quick-insights-btn').addEventListener('click', async function() {
+    const textarea = document.getElementById('complaint_text');
+    const symptomsText = textarea.value.trim();
+    
+    if (!symptomsText) {
+        alert('Please describe your symptoms first before getting insights.');
+        textarea.focus();
+        return;
+    }
+    
+    const button = this;
+    const originalText = button.innerHTML;
+    
+    // Show loading state
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+    button.disabled = true;
+    
+    try {
+        const response = await fetch('/analyze_symptoms_quick', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                symptoms: symptomsText
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Store insights data globally for form submission
+            window.currentInsightsData = data.insights;
+            
+            // Show insights and display medical labels
+            showQuickInsights(data.insights);
+            document.getElementById('insights-display').style.display = 'block';
+            button.style.display = 'none'; // Hide the insights button
+            
+            console.log('AI insights loaded and stored for submission');
+        } else {
+            alert('Error analyzing symptoms: ' + (data.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error: ' + error.message);
+    } finally {
+        button.innerHTML = originalText;
+        button.disabled = false;
+    }
+});
+
+// Form submission
+document.getElementById('complaints-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData();
+    formData.append('complaint_text', document.getElementById('complaint_text').value);
+    
+    // Include insights data if available
+    const insightsDisplay = document.getElementById('insights-display');
+    if (insightsDisplay.style.display !== 'none' && window.currentInsightsData) {
+        // Store the actual insights data as JSON
+        formData.append('symptom_insights', JSON.stringify(window.currentInsightsData));
+        formData.append('insights_generated', 'true');
+        console.log('Including AI insights data in form submission');
+    }
+    
+    const submitBtn = document.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    try {
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        submitBtn.disabled = true;
+        
+        const response = await fetch('/save_step5', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            window.location.href = '/step6';
+        } else {
+            alert('Error: ' + (data.error || 'Failed to save data'));
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error: ' + error.message);
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+});
+
+function showQuickInsights(insights) {
+    // Display only Medical Labels
+    const labelsDiv = document.getElementById('medical-labels-display');
+    if (insights.medical_labels && insights.medical_labels.length > 0) {
+        let labelsHtml = `
+            <div class="insights-section">
+                <h4><i class="fas fa-tags"></i> Medical Labels Identified</h4>
+                <div class="labels-grid">
+        `;
+        
+        insights.medical_labels.forEach(label => {
+            const severityClass = getSeverityClass(label.severity || 'moderate');
+            const confidenceColor = getConfidenceColor(label.confidence || 50);
+            
+            labelsHtml += `
+                <div class="label-card ${severityClass}">
+                    <div class="label-header">
+                        <h5><i class="fas fa-diagnoses"></i> ${label.label}</h5>
+                        <span class="confidence-badge" style="background-color: ${confidenceColor}">
+                            ${label.confidence || 50}%
+                        </span>
+                    </div>
+                    <div class="label-details">
+                        <p><strong>Category:</strong> ${label.category || 'General'}</p>
+                        <p><strong>Severity:</strong> ${label.severity || 'Moderate'}</p>
+                        <p class="description">${label.description || 'Medical term identified from symptoms'}</p>
+                    </div>
+                </div>
+            `;
+        });
+        
+        labelsHtml += `
+                </div>
+            </div>
+        `;
+        labelsDiv.innerHTML = labelsHtml;
+    }
+}
+
+// Helper functions for styling
+function getSeverityClass(severity) {
+    switch(severity.toLowerCase()) {
+        case 'mild': return 'severity-mild';
+        case 'moderate': return 'severity-moderate';
+        case 'severe': return 'severity-severe';
+        default: return 'severity-moderate';
+    }
+}
+
+function getConfidenceColor(confidence) {
+    if (confidence >= 80) return '#27ae60';
+    if (confidence >= 60) return '#f39c12';
+    return '#e74c3c';
+}
+</script>
+
+<style>
+/* Quick Insights Styling */
+.quick-insights-container {
+    text-align: center;
+    margin: 20px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+}
+
+.insights-help {
+    margin-top: 10px;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.insights-container {
+    margin-top: 20px;
+}
+
+.insights-section {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 15px 0;
+}
+
+.insights-section h4 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 8px;
+}
+
+/* Medical Labels Styling */
+.labels-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.label-card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.label-card.severity-mild {
+    border-left: 4px solid #27ae60;
+}
+
+.label-card.severity-moderate {
+    border-left: 4px solid #f39c12;
+}
+
+.label-card.severity-severe {
+    border-left: 4px solid #e74c3c;
+}
+
+.label-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.label-header h5 {
+    margin: 0;
+    color: #2c3e50;
+}
+
+.confidence-badge {
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.label-details {
+    margin-top: 10px;
+}
+
+.label-details p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.label-details .description {
+    color: #666;
+    font-style: italic;
+}
+
+.submit-container {
+    text-align: center;
+    padding: 20px;
+    background: #e8f5e8;
+    border: 1px solid #c3e6cb;
+    border-radius: 8px;
+}
+
+/* Loading styling */
+.loading-container {
+    text-align: center;
+    padding: 30px;
+}
+
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Character counter styling */
+.character-counter {
+    text-align: right;
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+#char-count {
+    font-weight: bold;
+}
+</style>
+{% endblock %}

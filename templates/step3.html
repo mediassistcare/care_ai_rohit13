@@ -1,0 +1,1611 @@
+{% extends "base.html" %}
+
+{% block title %}Vital Signs - Step 3 - Care Diagnostics{% endblock %}
+
+{% block content %}
+<div class="step-container">
+    <div class="step-header">
+        <h2><i class="fas fa-heartbeat"></i> Step 3: Comprehensive Vital Signs & Body Composition</h2>
+        <p>Please provide all available vital signs and physiological measurements</p>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 50%"></div>
+        </div>
+    </div>
+
+    <form id="vitalsForm" class="medical-form" novalidate>
+        
+        <!-- Pagination Controls -->
+        <div class="pagination-controls">
+            <div class="pagination-dots">
+                <div class="dot active" data-section="1">
+                    <span class="dot-number">1</span>
+                    <span class="dot-label">Core Vital Signs</span>
+                </div>
+                <div class="dot" data-section="2">
+                    <span class="dot-number">2</span>
+                    <span class="dot-label">Body Composition & Glucose</span>
+                </div>
+                <div class="dot" data-section="3">
+                    <span class="dot-number">3</span>
+                    <span class="dot-label">Heart, Lung & Respiratory</span>
+                </div>
+                <div class="dot" data-section="4">
+                    <span class="dot-number">4</span>
+                    <span class="dot-label">Medical Photography & AI</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: Core Vital Signs -->
+        <div class="form-section-page" id="section-1" style="display: block;">
+        
+        <!-- Essential Vital Signs Section -->
+        <div class="form-section vital-signs-section">
+            <h3><i class="fas fa-thermometer-half text-red"></i> Core Vital Signs</h3>
+            <p class="section-description">Essential vital signs required for medical assessment</p>
+            
+            <!-- Temperature -->
+            <div class="vitals-subsection">
+                <h4><i class="fas fa-thermometer-half"></i> Temperature</h4>
+                <div class="vitals-grid">
+                    <div class="form-group vital-input">
+                        <label for="temperature">Body Temperature *</label>
+                        <input type="number" id="temperature" name="temperature" step="0.1" required placeholder="e.g., 36.5" 
+                               value="{{ step3_data.get('temperature', '') }}">
+                        <div class="vital-range">Normal: 36.1-37.5°C (97.0-99.5°F)</div>
+                    </div>
+                    <div class="form-group vital-input">
+                        <label for="temperature_unit">Unit</label>
+                        <div class="radio-group-inline">
+                            <label class="radio-inline">
+                                <input type="radio" name="temperature_unit" value="celsius" 
+                                       {% if step3_data.get('temperature_unit', 'celsius') == 'celsius' %}checked{% endif %}>
+                                <span>Celsius (°C)</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="temperature_unit" value="fahrenheit"
+                                       {% if step3_data.get('temperature_unit') == 'fahrenheit' %}checked{% endif %}>
+                                <span>Fahrenheit (°F)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cardiovascular Measurements -->
+            <div class="vitals-subsection">
+                <h4><i class="fas fa-heart"></i> Cardiovascular</h4>
+                <div class="vitals-grid">
+                    <div class="form-group vital-input">
+                        <label for="pulse_rate">Pulse Rate (bpm) *</label>
+                        <input type="number" id="pulse_rate" name="pulse_rate" min="30" max="200" required placeholder="e.g., 72"
+                               value="{{ step3_data.get('pulse_rate', '') }}">
+                        <div class="vital-range">Normal: 60-100 bpm</div>
+                    </div>
+                    <div class="form-group vital-input">
+                        <label for="respiratory_rate">Respiratory Rate (bpm) *</label>
+                        <input type="number" id="respiratory_rate" name="respiratory_rate" min="8" max="40" required placeholder="e.g., 16"
+                               value="{{ step3_data.get('respiratory_rate', '') }}">
+                        <div class="vital-range">Normal: 12-20 bpm</div>
+                    </div>
+                </div>
+                
+                <div class="vitals-grid">
+                    <div class="form-group vital-input">
+                        <label for="systolic_bp">Systolic BP (mmHg) *</label>
+                        <input type="number" id="systolic_bp" name="systolic_bp" min="60" max="250" required placeholder="e.g., 120"
+                               value="{{ step3_data.get('systolic_bp', '') }}">
+                        <div class="vital-range">Normal: 90-120 mmHg</div>
+                    </div>
+                    <div class="form-group vital-input">
+                        <label for="diastolic_bp">Diastolic BP (mmHg) *</label>
+                        <input type="number" id="diastolic_bp" name="diastolic_bp" min="40" max="150" required placeholder="e.g., 80"
+                               value="{{ step3_data.get('diastolic_bp', '') }}">
+                        <div class="vital-range">Normal: 60-80 mmHg</div>
+                    </div>
+                </div>
+
+                <div class="vitals-grid">
+                    <div class="form-group vital-input">
+                        <label for="oxygen_saturation">Oxygen Saturation (SpO2) % *</label>
+                        <input type="number" id="oxygen_saturation" name="oxygen_saturation" min="70" max="100" required placeholder="e.g., 98"
+                               value="{{ step3_data.get('oxygen_saturation', '') }}">
+                        <div class="vital-range">Normal: >95%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Navigation for Section 1 -->
+        <div class="section-navigation">
+            <button type="button" class="btn-navigation btn-prev" style="visibility: hidden;" disabled>
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <button type="button" class="btn-navigation btn-next" onclick="nextSection()">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+        
+        </div>
+        <!-- End Section 1 -->
+
+        <!-- Section 2: Body Composition & Blood Glucose -->
+        <div class="form-section-page" id="section-2" style="display: none;">
+
+        <!-- Body Mass Composition Section -->
+        <div class="form-section composition-section">
+            <h3><i class="fas fa-weight text-blue"></i> Body Mass Composition</h3>
+            <p class="section-description">Comprehensive body composition analysis</p>
+            
+            <div class="vitals-subsection">
+                <h4><i class="fas fa-calculator"></i> Body Composition Metrics</h4>
+                <div class="vitals-grid">
+                    <div class="form-group vital-input">
+                        <label for="body_fat_percentage">Body Fat Percentage (%)</label>
+                        <input type="number" id="body_fat_percentage" name="body_fat_percentage" step="0.1" min="5" max="50" placeholder="e.g., 18.5">
+                        <div class="vital-range">Normal: Men 10-20%, Women 16-25%</div>
+                    </div>
+                    <div class="form-group vital-input">
+                        <label for="fat_mass">Fat Mass (kg)</label>
+                        <input type="number" id="fat_mass" name="fat_mass" step="0.1" min="1" max="100" placeholder="e.g., 12.5">
+                        <div class="vital-range">Total amount of body fat</div>
+                    </div>
+                </div>
+                
+                <div class="vitals-grid">
+                    <div class="form-group vital-input">
+                        <label for="lean_body_mass">Lean Body Mass (kg)</label>
+                        <input type="number" id="lean_body_mass" name="lean_body_mass" step="0.1" min="20" max="120" placeholder="e.g., 55.2">
+                        <div class="vital-range">Muscles, bones, water (non-fat)</div>
+                    </div>
+                    <div class="form-group vital-input">
+                        <label for="muscle_mass">Muscle Mass (kg)</label>
+                        <input type="number" id="muscle_mass" name="muscle_mass" step="0.1" min="15" max="80" placeholder="e.g., 32.1">
+                        <div class="vital-range">Total muscle tissue</div>
+                    </div>
+                </div>
+
+                <div class="vitals-grid">
+                    <div class="form-group vital-input">
+                        <label for="bone_density">Bone Density (T-score/Z-score)</label>
+                        <input type="number" id="bone_density" name="bone_density" step="0.1" min="-5" max="5" placeholder="e.g., -1.2">
+                        <div class="vital-range">Normal: T-score > -1.0</div>
+                    </div>
+                    <div class="form-group vital-input">
+                        <label for="total_body_water">Total Body Water (%)</label>
+                        <input type="number" id="total_body_water" name="total_body_water" step="0.1" min="40" max="80" placeholder="e.g., 60.5">
+                        <div class="vital-range">Normal: 50-70% of body weight</div>
+                    </div>
+                </div>
+
+                <div class="vitals-grid">
+                    <div class="form-group vital-input">
+                        <label for="bmi">Body Mass Index (BMI)</label>
+                        <input type="number" id="bmi" name="bmi" step="0.1" min="10" max="50" placeholder="e.g., 24.2">
+                        <div class="vital-range">Normal: 18.5-24.9</div>
+                    </div>
+                    <div class="form-group vital-input">
+                        <label for="segmental_analysis">Segmental Analysis Notes</label>
+                        <textarea id="segmental_analysis" name="segmental_analysis" rows="1" placeholder="e.g., Arms: 8.2kg, Legs: 22.1kg, Trunk: 28.5kg"></textarea>
+                        <div class="vital-range">Fat/lean mass in body segments</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blood Glucose Section -->
+        <div class="form-section glucose-section">
+            <h3><i class="fas fa-tint text-purple"></i> Blood Glucose</h3>
+            <p class="section-description">Blood sugar measurements</p>
+            
+            <div class="vitals-subsection">
+                <h4><i class="fas fa-vial"></i> Glucometer Reading</h4>
+                <div class="vitals-grid">
+                    <div class="form-group vital-input">
+                        <label for="blood_glucose">Random Blood Sugar (mg/dL)</label>
+                        <input type="number" id="blood_glucose" name="blood_glucose" min="50" max="600" placeholder="e.g., 110"
+                               value="{{ step3_data.get('blood_glucose', '') }}">
+                        <div class="vital-range">Normal: <140 mg/dL (random), 70-100 mg/dL (fasting)</div>
+                    </div>
+                    <div class="form-group vital-input">
+                        <label for="glucose_timing">Measurement Timing</label>
+                        <div class="radio-group-inline">
+                            <label class="radio-inline">
+                                <input type="radio" name="glucose_timing" value="fasting"
+                                       {% if step3_data.get('glucose_timing') == 'fasting' %}checked{% endif %}>
+                                <span>Fasting</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="glucose_timing" value="random"
+                                       {% if step3_data.get('glucose_timing', 'random') == 'random' %}checked{% endif %}>
+                                <span>Random</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="glucose_timing" value="post_meal"
+                                       {% if step3_data.get('glucose_timing') == 'post_meal' %}checked{% endif %}>
+                                <span>Post-meal</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Navigation for Section 2 -->
+        <div class="section-navigation">
+            <button type="button" class="btn-navigation btn-prev" onclick="prevSection()">
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <button type="button" class="btn-navigation btn-next" onclick="nextSection()">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+        
+        </div>
+        <!-- End Section 2 -->
+
+        <!-- Section 3: Heart, Lung & Respiratory -->
+        <div class="form-section-page" id="section-3" style="display: none;">
+
+        <!-- Heart Monitor Section -->
+        <div class="form-section heart-section">
+            <h3><i class="fas fa-stethoscope text-green"></i> Heart & Lung Assessment</h3>
+            <p class="section-description">Stethoscope findings and sound analysis</p>
+            
+            <div class="vitals-subsection">
+                <h4><i class="fas fa-lungs"></i> Stethoscope Findings</h4>
+                <div class="vitals-grid">
+                    <div class="form-group vital-input">
+                        <label for="lung_congestion">Lung Congestion</label>
+                        <div class="radio-group-inline">
+                            <label class="radio-inline">
+                                <input type="radio" name="lung_congestion" value="none" 
+                                       {% if step3_data.get('lung_congestion', 'none') == 'none' %}checked{% endif %}>
+                                <span>None</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="lung_congestion" value="mild"
+                                       {% if step3_data.get('lung_congestion') == 'mild' %}checked{% endif %}>
+                                <span>Mild</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="lung_congestion" value="moderate"
+                                       {% if step3_data.get('lung_congestion') == 'moderate' %}checked{% endif %}>
+                                <span>Moderate</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="lung_congestion" value="severe"
+                                       {% if step3_data.get('lung_congestion') == 'severe' %}checked{% endif %}>
+                                <span>Severe</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group vital-input">
+                        <label for="water_in_lungs">Water in Lungs</label>
+                        <div class="radio-group-inline">
+                            <label class="radio-inline">
+                                <input type="radio" name="water_in_lungs" value="none" 
+                                       {% if step3_data.get('water_in_lungs', 'none') == 'none' %}checked{% endif %}>
+                                <span>None</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="water_in_lungs" value="suspected"
+                                       {% if step3_data.get('water_in_lungs') == 'suspected' %}checked{% endif %}>
+                                <span>Suspected</span>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="water_in_lungs" value="present"
+                                       {% if step3_data.get('water_in_lungs') == 'present' %}checked{% endif %}>
+                                <span>Present</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group vital-input">
+                    <label for="heart_lung_notes">Additional Heart/Lung Findings</label>
+                    <textarea id="heart_lung_notes" name="heart_lung_notes" rows="2" placeholder="Describe any additional findings from stethoscope examination...">{{ step3_data.get('heart_lung_notes', '') }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- ECG Section -->
+        <div class="form-section ecg-section">
+            <h3><i class="fas fa-chart-line text-orange"></i> Electrocardiogram (ECG)</h3>
+            <p class="section-description">Heart rhythm and electrical activity</p>
+            
+            <div class="vitals-subsection">
+                <h4><i class="fas fa-heartbeat"></i> ECG Assessment</h4>
+                <div class="form-group vital-input">
+                    <label for="ecg_available">ECG Performed?</label>
+                    <div class="radio-group-inline">
+                        <label class="radio-inline">
+                            <input type="radio" name="ecg_available" value="no" 
+                                   {% if step3_data.get('ecg_available', 'no') == 'no' %}checked{% endif %}>
+                            <span>No</span>
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="ecg_available" value="yes"
+                                   {% if step3_data.get('ecg_available') == 'yes' %}checked{% endif %}>
+                            <span>Yes</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group vital-input">
+                    <label for="ecg_findings">ECG Findings</label>
+                    <textarea id="ecg_findings" name="ecg_findings" rows="2" placeholder="Describe ECG findings (rhythm, rate, intervals, abnormalities)...">{{ step3_data.get('ecg_findings', '') }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Respiratory Function Section -->
+        <div class="form-section respiratory-section">
+            <h3><i class="fas fa-wind text-cyan"></i> Respiratory Function</h3>
+            <p class="section-description">Breathing capacity and function tests</p>
+            
+            <div class="vitals-subsection">
+                <h4><i class="fas fa-lungs"></i> Pulmonary Function</h4>
+                <div class="vitals-grid">
+                    <div class="form-group vital-input">
+                        <label for="fev1">FEV1 (L) - Forced Expiratory Volume</label>
+                        <input type="number" id="fev1" name="fev1" step="0.1" min="0.5" max="6" placeholder="e.g., 3.2">
+                        <div class="vital-range">Normal varies by age/gender</div>
+                    </div>
+                    <div class="form-group vital-input">
+                        <label for="pef">PEF (L/min) - Peak Expiratory Flow</label>
+                        <input type="number" id="pef" name="pef" min="100" max="800" placeholder="e.g., 450">
+                        <div class="vital-range">Normal varies by age/gender</div>
+                    </div>
+                </div>
+                <div class="form-group vital-input">
+                    <label for="respiratory_notes">Additional Respiratory Notes</label>
+                    <textarea id="respiratory_notes" name="respiratory_notes" rows="1" placeholder="Any additional respiratory observations..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Navigation for Section 3 -->
+        <div class="section-navigation">
+            <button type="button" class="btn-navigation btn-prev" onclick="prevSection()">
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <button type="button" class="btn-navigation btn-next" onclick="nextSection()">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+        
+        </div>
+        <!-- End Section 3 -->
+
+        <!-- Section 4: Medical Photography & AI Analysis -->
+        <div class="form-section-page" id="section-4" style="display: none;">
+
+        <!-- Photography Section -->
+        <div class="form-section photography-section">
+            <h3><i class="fas fa-camera text-indigo"></i> Medical Photography with AI Analysis</h3>
+            <p class="section-description">Visual examination documentation with automated medical insights</p>
+            
+            <!-- Tongue Photography -->
+            <div class="vitals-subsection">
+                <h4><i class="fas fa-mouth-open"></i> Tongue Photography & Analysis</h4>
+                <div class="vitals-grid">
+                    <div class="form-group file-input">
+                        <label for="tongue_photo">Tongue Photo</label>
+                        <input type="file" id="tongue_photo" name="tongue_photo" accept="image/*">
+                        <div class="file-hint">Upload clear image of tongue</div>
+                        <div class="upload-status" id="tongue_upload_status"></div>
+                    </div>
+                    <div class="form-group vital-input">
+                        <label for="mouth_throat_comments">Manual Tongue Observations</label>
+                        <textarea id="mouth_throat_comments" name="mouth_throat_comments" rows="3" placeholder="Describe any observations (color, coating, lesions, swelling, etc.)..."></textarea>
+                    </div>
+                </div>
+                
+                <!-- AI Insights for Tongue -->
+                <div class="ai-insights-container" id="tongue_insights_container" style="display: none;">
+                    <div class="insights-header">
+                        <h5><i class="fas fa-brain"></i> AI Medical Insights - Tongue Analysis</h5>
+                        <div class="insights-loader" id="tongue_insights_loader">
+                            <i class="fas fa-spinner fa-spin"></i> Analyzing image...
+                        </div>
+                    </div>
+                    <div class="insights-content" id="tongue_insights_content"></div>
+                    <input type="hidden" id="tongue_ai_insights" name="tongue_ai_insights">
+                </div>
+            </div>
+
+            <!-- Throat Photography -->
+            <div class="vitals-subsection">
+                <h4><i class="fas fa-head-side-virus"></i> Throat Photography & Analysis</h4>
+                <div class="vitals-grid">
+                    <div class="form-group file-input">
+                        <label for="throat_photo">Throat Photo (Open Mouth)</label>
+                        <input type="file" id="throat_photo" name="throat_photo" accept="image/*">
+                        <div class="file-hint">Upload clear image of throat/oral cavity</div>
+                        <div class="upload-status" id="throat_upload_status"></div>
+                    </div>
+                    <div class="form-group vital-input">
+                        <label for="throat_manual_comments">Manual Throat Observations</label>
+                        <textarea id="throat_manual_comments" name="throat_manual_comments" rows="3" placeholder="Describe throat observations (redness, swelling, white patches, tonsils, etc.)..."></textarea>
+                    </div>
+                </div>
+                
+                <!-- AI Insights for Throat -->
+                <div class="ai-insights-container" id="throat_insights_container" style="display: none;">
+                    <div class="insights-header">
+                        <h5><i class="fas fa-brain"></i> AI Medical Insights - Throat Analysis</h5>
+                        <div class="insights-loader" id="throat_insights_loader">
+                            <i class="fas fa-spinner fa-spin"></i> Analyzing image...
+                        </div>
+                    </div>
+                    <div class="insights-content" id="throat_insights_content"></div>
+                    <input type="hidden" id="throat_ai_insights" name="throat_ai_insights">
+                </div>
+            </div>
+
+            <!-- Skin/Infection Photography -->
+            <div class="vitals-subsection">
+                <h4><i class="fas fa-band-aid"></i> Skin & Infection Photography & Analysis</h4>
+                <div class="vitals-grid">
+                    <div class="form-group file-input">
+                        <label for="infection_photo">Skin Rash/Infection Photo</label>
+                        <input type="file" id="infection_photo" name="infection_photo" accept="image/*">
+                        <div class="file-hint">Upload image of any skin conditions</div>
+                        <div class="upload-status" id="infection_upload_status"></div>
+                    </div>
+                    <div class="form-group vital-input">
+                        <label for="infection_location">Location of Condition</label>
+                        <input type="text" id="infection_location" name="infection_location" placeholder="e.g., Left arm, Face, Back">
+                    </div>
+                </div>
+                <div class="form-group vital-input">
+                    <label for="skin_infection_comments">Manual Skin/Infection Observations</label>
+                    <textarea id="skin_infection_comments" name="skin_infection_comments" rows="3" placeholder="Describe skin condition (size, color, texture, pain, itching, duration, etc.)..."></textarea>
+                </div>
+                
+                <!-- AI Insights for Skin/Infection -->
+                <div class="ai-insights-container" id="infection_insights_container" style="display: none;">
+                    <div class="insights-header">
+                        <h5><i class="fas fa-brain"></i> AI Medical Insights - Skin/Infection Analysis</h5>
+                        <div class="insights-loader" id="infection_insights_loader">
+                            <i class="fas fa-spinner fa-spin"></i> Analyzing image...
+                        </div>
+                    </div>
+                    <div class="insights-content" id="infection_insights_content"></div>
+                    <input type="hidden" id="infection_ai_insights" name="infection_ai_insights">
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Navigation for Section 4 -->
+        <div class="section-navigation">
+            <button type="button" class="btn-navigation btn-prev" onclick="prevSection()">
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <button type="button" class="btn-navigation btn-next" onclick="submitFormData()" style="background: linear-gradient(135deg, #27ae60, #2ecc71);">
+                Save Vital Signs & Continue <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+        
+        </div>
+        <!-- End Section 4 -->
+
+    </form>
+</div>
+
+<style>
+/* Remove custom step-container to use global styles like step2 and step4 */
+
+.step-header {
+    text-align: center;
+    margin-bottom: 6px;
+}
+
+.step-header h2 {
+    color: #2c3e50;
+    margin-bottom: 3px;
+    font-size: 1.3em;
+}
+
+.step-header p {
+    margin-bottom: 4px;
+    font-size: 0.85em;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background-color: #ecf0f1;
+    border-radius: 3px;
+    margin: 12px 0;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3498db, #2ecc71);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.medical-form {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Compact styling for sections 2 and 3 */
+#section-2 .form-section, #section-3 .form-section {
+    padding: 6px;
+    margin-bottom: 3px;
+}
+
+#section-2 .vitals-subsection, #section-3 .vitals-subsection {
+    margin-bottom: 3px;
+}
+
+#section-2 .section-description, #section-3 .section-description {
+    margin-bottom: 2px;
+    font-size: 0.7em;
+    line-height: 1.2;
+}
+
+#section-2 .vitals-grid, #section-3 .vitals-grid {
+    gap: 6px;
+    margin-bottom: 3px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+#section-2 .radio-group-inline, #section-3 .radio-group-inline {
+    gap: 6px;
+    margin-top: 1px;
+}
+
+#section-2 .form-group, #section-3 .form-group {
+    margin-bottom: 4px;
+}
+
+#section-2 .section-navigation, #section-3 .section-navigation {
+    margin-top: 6px;
+    padding: 4px;
+}
+
+#section-2 .form-section h3, #section-3 .form-section h3 {
+    margin-bottom: 2px;
+    font-size: 1.0em;
+}
+
+#section-2 .vitals-subsection h4, #section-3 .vitals-subsection h4 {
+    margin-bottom: 3px;
+    font-size: 0.9em;
+    padding-bottom: 1px;
+}
+
+#section-2 .vital-input label, #section-3 .vital-input label {
+    margin-bottom: 1px;
+    font-size: 0.8em;
+}
+
+#section-2 .vital-input input, #section-3 .vital-input input,
+#section-2 .vital-input textarea, #section-3 .vital-input textarea {
+    padding: 4px;
+    font-size: 0.8em;
+}
+
+#section-2 .vital-range, #section-3 .vital-range {
+    margin-top: 1px;
+    font-size: 0.7em;
+}
+
+#section-2 .radio-inline, #section-3 .radio-inline {
+    gap: 2px;
+    font-size: 0.8em;
+}
+
+#section-2 .radio-inline span, #section-3 .radio-inline span {
+    line-height: 1.2;
+}
+
+/* Make sections 2 and 3 overall more compact */
+#section-2, #section-3 {
+    gap: 4px !important;
+}
+
+#section-2 .medical-form, #section-3 .medical-form {
+    gap: 4px;
+}
+
+/* Specific section type compacting */
+.composition-section, .glucose-section, .heart-section, .ecg-section, .respiratory-section {
+    margin-bottom: 4px !important;
+}
+
+#section-2 .composition-section, #section-2 .glucose-section,
+#section-3 .heart-section, #section-3 .ecg-section, #section-3 .respiratory-section {
+    padding: 6px !important;
+    margin-bottom: 3px !important;
+}
+
+.form-section {
+    background: white;
+    border-radius: 6px;
+    padding: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    border: 1px solid #e8f4fd;
+    margin-bottom: 4px;
+}
+
+.form-section h3 {
+    color: #2c3e50;
+    margin-bottom: 4px;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-description {
+    color: #7f8c8d;
+    margin-bottom: 6px;
+    font-style: italic;
+    font-size: 0.8em;
+}
+
+.vitals-subsection {
+    margin-bottom: 8px;
+}
+
+.vitals-subsection h4 {
+    color: #34495e;
+    margin-bottom: 6px;
+    font-size: 0.95em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.vitals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 2px;
+    font-size: 0.85em;
+}
+
+.vital-input input, .vital-input textarea {
+    padding: 6px;
+    border: 1px solid #e8f4fd;
+    border-radius: 4px;
+    font-size: 0.85em;
+    transition: all 0.3s ease;
+    background-color: #fafbfc;
+}
+
+.vital-input input:focus, .vital-input textarea:focus {
+    outline: none;
+    border-color: #3498db;
+    background-color: white;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+.vital-range {
+    font-size: 0.75em;
+    color: #7f8c8d;
+    margin-top: 2px;
+    font-style: italic;
+}
+
+.file-input input[type="file"] {
+    padding: 4px;
+    border: 1px dashed #bdc3c7;
+    border-radius: 4px;
+    background-color: #fafbfc;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+
+.file-input input[type="file"]:hover {
+    border-color: #3498db;
+    background-color: #f8f9fa;
+}
+
+.file-hint {
+    font-size: 0.75em;
+    color: #7f8c8d;
+    margin-top: 2px;
+}
+
+.radio-group-inline {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 3px;
+}
+
+.radio-inline {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    font-size: 0.85em;
+}
+
+.radio-inline input[type="radio"] {
+    margin: 0;
+    cursor: pointer;
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 0.9em;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+}
+
+.btn-submit:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.submit-container {
+    text-align: center;
+}
+
+.submit-note {
+    color: #7f8c8d;
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+
+/* Color classes for icons */
+.text-red { color: #e74c3c; }
+.text-blue { color: #3498db; }
+.text-purple { color: #9b59b6; }
+.text-green { color: #27ae60; }
+.text-orange { color: #f39c12; }
+.text-cyan { color: #1abc9c; }
+.text-indigo { color: #6c5ce7; }
+
+/* Pagination Controls Styles */
+.pagination-controls {
+    margin-bottom: 6px;
+    padding: 4px;
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.pagination-dots {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.pagination-dots::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 30px;
+    right: 30px;
+    height: 1px;
+    background: #e9ecef;
+    z-index: 1;
+}
+
+.dot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+    padding: 3px;
+    border-radius: 4px;
+}
+
+.dot:hover {
+    background: rgba(52, 152, 219, 0.1);
+}
+
+.dot-number {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 10px;
+    margin-bottom: 2px;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+.dot-label {
+    font-size: 9px;
+    color: #6c757d;
+    font-weight: 500;
+    max-width: 80px;
+    line-height: 1.1;
+    transition: color 0.3s ease;
+}
+
+.dot.active .dot-number {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border-color: #3498db;
+    transform: scale(1.05);
+}
+
+.dot.active .dot-label {
+    color: #3498db;
+    font-weight: 600;
+}
+
+.dot.completed .dot-number {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: white;
+    border-color: #27ae60;
+}
+
+.dot.completed .dot-label {
+    color: #27ae60;
+    font-weight: 500;
+}
+
+/* Form Section Styles */
+.form-section-page {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Extra compact styling for form pages 2 and 3 */
+#section-2.form-section-page, #section-3.form-section-page {
+    padding: 6px 0;
+    line-height: 1.3;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Section Navigation Styles */
+.section-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+}
+
+.btn-navigation {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 100px;
+    justify-content: center;
+}
+
+.btn-navigation:hover:not(:disabled) {
+    background: linear-gradient(135deg, #2980b9, #21618c);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(52, 152, 219, 0.2);
+}
+
+.btn-navigation:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-navigation.btn-prev {
+    background: linear-gradient(135deg, #6c757d, #5a6268);
+}
+
+.btn-navigation.btn-prev:hover:not(:disabled) {
+    background: linear-gradient(135deg, #5a6268, #495057);
+}
+
+/* Responsive Design for Pagination */
+@media (max-width: 768px) {
+    .pagination-dots {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    
+    .pagination-dots::before {
+        display: none;
+    }
+    
+    .dot {
+        flex: 1;
+        min-width: 60px;
+    }
+    
+    .dot-label {
+        font-size: 8px;
+        max-width: 60px;
+    }
+    
+    .dot-number {
+        width: 18px;
+        height: 18px;
+        font-size: 9px;
+        margin-bottom: 2px;
+    }
+    
+    .section-navigation {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .btn-navigation {
+        width: 100%;
+        max-width: 150px;
+    }
+}
+
+/* AI Insights Styling */
+.ai-insights-container {
+    margin-top: 10px;
+    border: 1px solid #e8f4fd;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #f8fbff, #f0f8ff);
+    overflow: hidden;
+}
+
+.insights-header {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.insights-header h5 {
+    margin: 0;
+    font-size: 0.85em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.insights-loader {
+    font-size: 0.75em;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.insights-content {
+    padding: 10px;
+    font-size: 0.8em;
+    line-height: 1.4;
+    color: #2c3e50;
+}
+
+.insight-section {
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.insight-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.insight-label {
+    font-weight: 600;
+    color: #2980b9;
+    margin-bottom: 2px;
+}
+
+.insight-value {
+    color: #34495e;
+    margin-bottom: 4px;
+}
+
+.confidence-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.confidence-high {
+    background-color: #d5f4e6;
+    color: #27ae60;
+}
+
+.confidence-medium {
+    background-color: #fef9e7;
+    color: #f39c12;
+}
+
+.confidence-low {
+    background-color: #fadbd8;
+    color: #e74c3c;
+}
+
+.upload-status {
+    margin-top: 8px;
+    font-size: 0.85em;
+    padding: 6px 10px;
+    border-radius: 5px;
+    display: none;
+}
+
+.upload-success {
+    background-color: #d5f4e6;
+    color: #27ae60;
+    border: 1px solid #27ae60;
+}
+
+.upload-error {
+    background-color: #fadbd8;
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+}
+
+.upload-analyzing {
+    background-color: #e8f4fd;
+    color: #3498db;
+    border: 1px solid #3498db;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .vitals-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .radio-group-inline {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .step-container {
+        padding: 15px;
+    }
+    
+    .form-section {
+        padding: 20px;
+    }
+}
+</style>
+
+<script>
+// Pagination variables
+let currentSection = 1;
+const totalSections = 4;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('vitalsForm');
+    
+    // Initialize pagination
+    initializePagination();
+    
+    // Form submission with comprehensive validation
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Call submitForm function instead of inline submission
+        submitFormData();
+    });
+    
+    // Enhanced file upload functionality with AI analysis
+    const medicalPhotoInputs = {
+        'tongue_photo': 'tongue',
+        'throat_photo': 'throat', 
+        'infection_photo': 'infection'
+    };
+    
+    Object.keys(medicalPhotoInputs).forEach(inputId => {
+        const input = document.getElementById(inputId);
+        const photoType = medicalPhotoInputs[inputId];
+        
+        input.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const hint = this.parentElement.querySelector('.file-hint');
+                hint.textContent = `Selected: ${file.name}`;
+                hint.style.color = '#27ae60';
+                
+                // Show upload status
+                const statusDiv = document.getElementById(`${photoType}_upload_status`);
+                statusDiv.className = 'upload-status upload-analyzing';
+                statusDiv.style.display = 'block';
+                statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading and analyzing...';
+                
+                // Start AI analysis
+                analyzeImageWithAI(file, photoType);
+            }
+        });
+    });
+    
+    async function analyzeImageWithAI(file, photoType) {
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('photo_type', photoType);
+        
+        const statusDiv = document.getElementById(`${photoType}_upload_status`);
+        const insightsContainer = document.getElementById(`${photoType}_insights_container`);
+        const insightsLoader = document.getElementById(`${photoType}_insights_loader`);
+        const insightsContent = document.getElementById(`${photoType}_insights_content`);
+        const hiddenInput = document.getElementById(`${photoType}_ai_insights`);
+        
+        try {
+            // Show insights container and loader
+            insightsContainer.style.display = 'block';
+            insightsLoader.style.display = 'block';
+            insightsContent.innerHTML = '';
+            
+            const response = await fetch('/analyze_medical_photo', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Update status
+                statusDiv.className = 'upload-status upload-success';
+                statusDiv.innerHTML = '<i class="fas fa-check"></i> Upload successful - AI analysis complete';
+                
+                // Hide loader and show insights
+                insightsLoader.style.display = 'none';
+                displayInsights(result.insights, insightsContent, photoType);
+                
+                // Store insights in hidden field
+                hiddenInput.value = JSON.stringify(result.insights);
+                
+            } else {
+                throw new Error(result.error || 'Analysis failed');
+            }
+            
+        } catch (error) {
+            console.error('AI analysis error:', error);
+            
+            // Update status to error
+            statusDiv.className = 'upload-status upload-error';
+            statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Analysis failed - ' + error.message;
+            
+            // Hide loader and show error
+            insightsLoader.style.display = 'none';
+            insightsContent.innerHTML = `
+                <div class="insight-section">
+                    <div class="insight-label">Analysis Error</div>
+                    <div class="insight-value" style="color: #e74c3c;">
+                        Unable to analyze image: ${error.message}
+                    </div>
+                </div>
+            `;
+        }
+    }
+    
+    function displayInsights(insights, container, photoType) {
+        let html = '';
+        
+        // General findings
+        if (insights.general_findings) {
+            html += `
+                <div class="insight-section">
+                    <div class="insight-label">General Findings</div>
+                    <div class="insight-value">${insights.general_findings}</div>
+                </div>
+            `;
+        }
+        
+        // Specific observations
+        if (insights.specific_observations && insights.specific_observations.length > 0) {
+            html += `
+                <div class="insight-section">
+                    <div class="insight-label">Specific Observations</div>
+                    <div class="insight-value">
+                        <ul style="margin: 0; padding-left: 20px;">
+                            ${insights.specific_observations.map(obs => `<li>${obs}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Confidence and recommendations
+        if (insights.confidence_level) {
+            const confidenceClass = `confidence-${insights.confidence_level.toLowerCase()}`;
+            html += `
+                <div class="insight-section">
+                    <div class="insight-label">Analysis Confidence</div>
+                    <div class="insight-value">
+                        <span class="confidence-badge ${confidenceClass}">${insights.confidence_level}</span>
+                    </div>
+                </div>
+            `;
+        }
+        
+        if (insights.recommendations) {
+            html += `
+                <div class="insight-section">
+                    <div class="insight-label">Medical Recommendations</div>
+                    <div class="insight-value">${insights.recommendations}</div>
+                </div>
+            `;
+        }
+        
+        // Red flags or concerns
+        if (insights.concerns && insights.concerns.length > 0) {
+            html += `
+                <div class="insight-section">
+                    <div class="insight-label" style="color: #e74c3c;">⚠️ Areas of Concern</div>
+                    <div class="insight-value">
+                        <ul style="margin: 0; padding-left: 20px; color: #e74c3c;">
+                            ${insights.concerns.map(concern => `<li>${concern}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+        
+        container.innerHTML = html;
+    }
+    
+    // Add validation for blood pressure (systolic should be higher than diastolic)
+    const systolicInput = document.getElementById('systolic_bp');
+    const diastolicInput = document.getElementById('diastolic_bp');
+    
+    function validateBloodPressure() {
+        const systolicInput = document.getElementById('systolic_bp');
+        const diastolicInput = document.getElementById('diastolic_bp');
+        
+        if (!systolicInput || !diastolicInput) {
+            console.warn('Blood pressure inputs not found');
+            return;
+        }
+        
+        const systolic = parseFloat(systolicInput.value);
+        const diastolic = parseFloat(diastolicInput.value);
+        
+        if (systolic && diastolic && systolic <= diastolic) {
+            diastolicInput.setCustomValidity('Diastolic pressure must be lower than systolic pressure');
+        } else {
+            diastolicInput.setCustomValidity('');
+        }
+    }
+    
+    systolicInput.addEventListener('input', validateBloodPressure);
+    diastolicInput.addEventListener('input', validateBloodPressure);
+    
+    // Add temperature validation based on selected unit
+    const temperatureInput = document.getElementById('temperature');
+    const temperatureUnitRadios = document.querySelectorAll('input[name="temperature_unit"]');
+    
+    function validateTemperature() {
+        const temperature = parseFloat(temperatureInput.value);
+        const selectedUnit = document.querySelector('input[name="temperature_unit"]:checked')?.value || 'celsius';
+        
+        console.log('Temperature validation:', temperature, 'Unit:', selectedUnit); // Debug log
+        
+        if (temperature) {
+            let isValid = false;
+            let errorMessage = '';
+            
+            if (selectedUnit === 'celsius') {
+                // Celsius validation: reasonable range 25-45°C
+                if (temperature >= 25 && temperature <= 45) {
+                    isValid = true;
+                } else {
+                    errorMessage = 'Temperature in Celsius should be between 25°C and 45°C';
+                }
+                
+                // Update placeholder and hint for Celsius
+                temperatureInput.placeholder = 'e.g., 36.5';
+                const rangeHint = temperatureInput.parentElement.querySelector('.vital-range');
+                rangeHint.textContent = 'Normal: 36.1-37.5°C (97.0-99.5°F)';
+                
+            } else if (selectedUnit === 'fahrenheit') {
+                // Fahrenheit validation: reasonable range 77-113°F
+                if (temperature >= 77 && temperature <= 113) {
+                    isValid = true;
+                } else {
+                    errorMessage = 'Temperature in Fahrenheit should be between 77°F and 113°F';
+                }
+                
+                // Update placeholder and hint for Fahrenheit
+                temperatureInput.placeholder = 'e.g., 98.6';
+                const rangeHint = temperatureInput.parentElement.querySelector('.vital-range');
+                rangeHint.textContent = 'Normal: 97.0-99.5°F (36.1-37.5°C)';
+            }
+            
+            console.log('Validation result:', isValid, errorMessage); // Debug log
+            
+            if (isValid) {
+                temperatureInput.setCustomValidity('');
+                temperatureInput.style.borderColor = '#e8f4fd';
+            } else {
+                temperatureInput.setCustomValidity(errorMessage);
+                temperatureInput.style.borderColor = '#e74c3c';
+            }
+        } else {
+            temperatureInput.setCustomValidity('');
+            temperatureInput.style.borderColor = '#e8f4fd';
+        }
+    }
+    
+    // Dedicated temperature validation function for form submission
+    function validateTemperatureForSubmit() {
+        const temperatureInput = document.getElementById('temperature');
+        if (!temperatureInput) {
+            return {
+                isValid: false,
+                error: 'Temperature input field not found'
+            };
+        }
+        
+        const temperature = parseFloat(temperatureInput.value);
+        const selectedUnit = document.querySelector('input[name="temperature_unit"]:checked')?.value || 'celsius';
+        
+        console.log('Form submit temperature validation:', temperature, 'Unit:', selectedUnit); // Debug log
+        
+        // Check if temperature is provided (since it's required)
+        if (!temperature || isNaN(temperature)) {
+            return {
+                isValid: false,
+                error: 'Body temperature is required'
+            };
+        }
+        
+        let isValid = false;
+        let errorMessage = '';
+        
+        if (selectedUnit === 'celsius') {
+            // Celsius validation: reasonable range 25-45°C
+            if (temperature >= 25 && temperature <= 45) {
+                isValid = true;
+            } else {
+                errorMessage = `Temperature ${temperature}°C is invalid. Celsius temperature should be between 25°C and 45°C`;
+            }
+        } else if (selectedUnit === 'fahrenheit') {
+            // Fahrenheit validation: reasonable range 77-113°F
+            if (temperature >= 77 && temperature <= 113) {
+                isValid = true;
+            } else {
+                errorMessage = `Temperature ${temperature}°F is invalid. Fahrenheit temperature should be between 77°F and 113°F`;
+            }
+        } else {
+            errorMessage = 'Please select a temperature unit (Celsius or Fahrenheit)';
+        }
+        
+        console.log('Form submit validation result:', isValid, errorMessage); // Debug log
+        
+        return {
+            isValid: isValid,
+            error: errorMessage
+        };
+    }
+    
+    // Add event listeners for temperature validation
+    temperatureInput.addEventListener('input', validateTemperature);
+    temperatureUnitRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            // Clear temperature input when unit changes to avoid confusion
+            // temperatureInput.value = '';
+            validateTemperature();
+        });
+    });
+    
+    // Initial temperature validation setup
+    validateTemperature();
+});
+
+// Pagination Functions
+function initializePagination() {
+    // Initialize pagination dots click handlers
+    const dots = document.querySelectorAll('.pagination-dots .dot');
+    dots.forEach(dot => {
+        dot.addEventListener('click', function() {
+            const targetSection = parseInt(this.getAttribute('data-section'));
+            showSection(targetSection);
+        });
+    });
+    
+    // Initialize section 1 as visible
+    showSection(1);
+}
+
+function nextSection() {
+    if (currentSection < totalSections) {
+        showSection(currentSection + 1);
+    } else {
+        submitForm();
+    }
+}
+
+function prevSection() {
+    if (currentSection > 1) {
+        showSection(currentSection - 1);
+    }
+}
+
+function showSection(sectionNumber) {
+    // Hide all sections
+    for (let i = 1; i <= totalSections; i++) {
+        const section = document.getElementById(`section-${i}`);
+        if (section) {
+            section.style.display = 'none';
+        }
+    }
+    
+    // Show target section
+    const targetSection = document.getElementById(`section-${sectionNumber}`);
+    if (targetSection) {
+        targetSection.style.display = 'block';
+        currentSection = sectionNumber;
+        
+        // Update pagination dots
+        updatePaginationDots(sectionNumber);
+        
+        // Update progress bar
+        updateProgressBar(sectionNumber);
+        
+        // Scroll to top of form
+        const stepContainer = document.querySelector('.step-container');
+        if (stepContainer) {
+            stepContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+}
+
+function updatePaginationDots(activeSection) {
+    const dots = document.querySelectorAll('.pagination-dots .dot');
+    dots.forEach((dot, index) => {
+        const sectionNumber = index + 1;
+        if (sectionNumber === activeSection) {
+            dot.classList.add('active');
+        } else if (sectionNumber < activeSection) {
+            dot.classList.remove('active');
+            dot.classList.add('completed');
+        } else {
+            dot.classList.remove('active', 'completed');
+        }
+    });
+}
+
+function updateProgressBar(activeSection) {
+    const progressFill = document.querySelector('.progress-fill');
+    if (progressFill) {
+        const percentage = (activeSection / totalSections) * 33.33; // Keep same scale as original
+        progressFill.style.width = `${percentage}%`;
+    }
+}
+
+function submitForm() {
+    console.log('submitForm() called');
+    // Call the form submission function
+    submitFormData();
+}
+
+function submitFormData() {
+    console.log('=== submitFormData() called ===');
+    
+    const form = document.getElementById('vitalsForm');
+    
+    if (!form) {
+        console.error('Form not found!');
+        alert('Error: Form not found');
+        return;
+    }
+    
+    console.log('Form found, proceeding with submission...');
+    
+    // Show loading on the final button
+    const submitBtn = document.querySelector('.section-navigation .btn-next');
+    if (!submitBtn) {
+        console.error('Submit button not found!');
+        alert('Error: Submit button not found');
+        return;
+    }
+    
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    submitBtn.disabled = true;
+    
+    const formData = new FormData(form);
+    
+    console.log('Sending data to /save_vitals...');
+    
+    fetch('/save_vitals', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        console.log('Response received:', response.status, response.statusText);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response data:', data);
+        if (data.success) {
+            console.log('Success! Redirecting...');
+            submitBtn.innerHTML = '<i class="fas fa-check"></i> Saved Successfully!';
+            submitBtn.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
+            setTimeout(() => {
+                const redirectUrl = data.redirect_url || '/step4';
+                console.log('Navigating to', redirectUrl);
+                window.location.href = redirectUrl;
+            }, 1500);
+        } else {
+            console.error('Server error:', data.error);
+            alert('Error saving vital signs: ' + (data.error || 'Unknown error'));
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        alert('Network error: ' + error.message);
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,1273 @@
+{% extends "base.html" %}
+
+{% block title %}ICD11 Code Generation - Step 7 - Care Diagnostics{% endblock %}
+
+{% block content %}
+<div class="step-container">
+    <div class="step-header">
+        <h2><i class="fas fa-code-branch"></i> Step 7: ICD11 Code Generation and Analysis</h2>
+        <p>Generate standardized ICD11 medical codes based on your comprehensive clinical assessment</p>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 100%"></div>
+        </div>
+    </div>
+
+    <div class="icd-container">
+        <!-- Clinical Summary Section -->
+        <div class="clinical-summary-section">
+            <h3><i class="fas fa-file-medical-alt"></i> Clinical Summary</h3>
+            <p class="section-description">Review and edit the clinical summary before generating ICD11 codes</p>
+            
+            <div class="summary-input-container">
+                <label for="clinical-summary-text" class="form-label">Clinical Summary:</label>
+                <textarea 
+                    id="clinical-summary-text" 
+                    name="clinical-summary-text" 
+                    class="form-control clinical-summary-textarea"
+                    rows="12"
+                    placeholder="Loading clinical summary from previous step..."
+                    readonly>
+                </textarea>
+                <div class="summary-actions">
+                    <button type="button" class="btn-secondary" id="edit-summary-btn" onclick="toggleSummaryEdit()">
+                        <i class="fas fa-edit"></i> Edit Summary
+                    </button>
+                    <button type="button" class="btn-secondary" id="save-summary-btn" onclick="saveSummaryChanges()" style="display: none;">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <button type="button" class="btn-secondary" id="cancel-edit-btn" onclick="cancelSummaryEdit()" style="display: none;">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="step-actions">
+            <button type="button" class="btn-secondary" onclick="window.location.href='/step6'">
+                <i class="fas fa-arrow-left"></i> Back to Step 6
+            </button>
+            <button type="button" class="btn-primary" id="generate-icd-btn" onclick="generateICD11Codes()">
+                Generate ICD11 Codes <i class="fas fa-code"></i>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let originalSummary = '';
+let currentSummary = '';
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Load clinical summary from step 6
+    loadClinicalSummary();
+});
+
+function loadClinicalSummary() {
+    console.log('Loading clinical summary from step 6...');
+    
+    fetch('/get_clinical_summary', {
+        method: 'GET'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.clinical_summary) {
+            originalSummary = data.clinical_summary;
+            currentSummary = data.clinical_summary;
+            
+            const textarea = document.getElementById('clinical-summary-text');
+            textarea.value = data.clinical_summary;
+            textarea.removeAttribute('readonly');
+            
+            console.log('Clinical summary loaded:', data.clinical_summary.length, 'characters');
+        } else {
+            console.error('Failed to load clinical summary:', data.error);
+            const textarea = document.getElementById('clinical-summary-text');
+            textarea.value = 'No clinical summary available. Please complete the previous steps first.';
+            textarea.setAttribute('readonly', 'readonly');
+            
+            // Show error message
+            showError(data.error || 'Failed to load clinical summary from previous step');
+        }
+    })
+    .catch(error => {
+        console.error('Error loading clinical summary:', error);
+        const textarea = document.getElementById('clinical-summary-text');
+        textarea.value = 'Error loading clinical summary: ' + error.message;
+        textarea.setAttribute('readonly', 'readonly');
+        
+        showError('Network error: ' + error.message);
+    });
+}
+
+function toggleSummaryEdit() {
+    const textarea = document.getElementById('clinical-summary-text');
+    const editBtn = document.getElementById('edit-summary-btn');
+    const saveBtn = document.getElementById('save-summary-btn');
+    const cancelBtn = document.getElementById('cancel-edit-btn');
+    
+    // Enable editing
+    textarea.removeAttribute('readonly');
+    textarea.focus();
+    
+    // Toggle button visibility
+    editBtn.style.display = 'none';
+    saveBtn.style.display = 'inline-block';
+    cancelBtn.style.display = 'inline-block';
+    
+    // Add editing class for styling
+    textarea.classList.add('editing');
+}
+
+function saveSummaryChanges() {
+    const textarea = document.getElementById('clinical-summary-text');
+    const newSummary = textarea.value.trim();
+    
+    if (!newSummary) {
+        alert('Clinical summary cannot be empty');
+        return;
+    }
+    
+    console.log('Saving updated clinical summary...');
+    
+    // Save the updated summary
+    fetch('/save_clinical_summary', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            clinical_summary: newSummary,
+            updated_from_step7: true
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            currentSummary = newSummary;
+            originalSummary = newSummary;
+            
+            // Disable editing mode
+            finishSummaryEdit();
+            
+            // Show success message
+            showSuccess('Clinical summary updated successfully');
+            
+            console.log('Clinical summary updated successfully');
+        } else {
+            console.error('Failed to save summary changes:', data.error);
+            showError('Failed to save changes: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error saving summary changes:', error);
+        showError('Error saving changes: ' + error.message);
+    });
+}
+
+function cancelSummaryEdit() {
+    const textarea = document.getElementById('clinical-summary-text');
+    
+    // Restore original summary
+    textarea.value = originalSummary;
+    
+    // Disable editing mode
+    finishSummaryEdit();
+}
+
+function finishSummaryEdit() {
+    const textarea = document.getElementById('clinical-summary-text');
+    const editBtn = document.getElementById('edit-summary-btn');
+    const saveBtn = document.getElementById('save-summary-btn');
+    const cancelBtn = document.getElementById('cancel-edit-btn');
+    
+    // Disable editing
+    textarea.setAttribute('readonly', 'readonly');
+    
+    // Toggle button visibility
+    editBtn.style.display = 'inline-block';
+    saveBtn.style.display = 'none';
+    cancelBtn.style.display = 'none';
+    
+    // Remove editing class
+    textarea.classList.remove('editing');
+}
+
+function generateICD11Codes() {
+    const textarea = document.getElementById('clinical-summary-text');
+    const clinicalSummary = textarea.value.trim();
+    
+    if (!clinicalSummary) {
+        showError('Please provide a clinical summary before generating ICD11 codes');
+        return;
+    }
+    
+    console.log('Testing endpoint connectivity first...');
+    
+    // Test endpoint connectivity first
+    fetch('/test_icd_endpoint', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            test: true,
+            clinical_summary: clinicalSummary
+        })
+    })
+    .then(response => {
+        console.log('Test response status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Test response data:', data);
+        if (data.success) {
+            console.log('✅ Test endpoint working, proceeding with ICD generation...');
+            generateICD11CodesActual(clinicalSummary);
+        } else {
+            console.error('❌ Test endpoint failed:', data);
+            alert('Connection test failed: ' + JSON.stringify(data));
+        }
+    })
+    .catch(error => {
+        console.error('❌ Test endpoint error:', error);
+        alert('Connection test error: ' + error.message);
+    });
+}
+
+function generateICD11CodesActual(clinicalSummary) {
+    console.log('Generating ICD11 codes...');
+    
+    const generateBtn = document.getElementById('generate-icd-btn');
+    generateBtn.disabled = true;
+    generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Codes...';
+    
+    // Create and show results container if it doesn't exist
+    let resultsContainer = document.getElementById('icd-results');
+    if (!resultsContainer) {
+        resultsContainer = document.createElement('div');
+        resultsContainer.id = 'icd-results';
+        resultsContainer.className = 'icd-results-section';
+        document.querySelector('.icd-container').appendChild(resultsContainer);
+    }
+    
+    // Show loading state
+    resultsContainer.innerHTML = `
+        <div class="loading-state">
+            <div class="loading-spinner">
+                <i class="fas fa-cog fa-spin fa-2x"></i>
+            </div>
+            <h3>Generating ICD-11 codes...</h3>
+            <p>Analyzing clinical summary and generating WHO ICD-11 diagnostic codes...</p>
+        </div>
+    `;
+    resultsContainer.style.display = 'block';
+    
+    // Call ICD generation endpoint
+    fetch('/generate_icd_codes', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            clinical_summary: clinicalSummary
+        })
+    })
+    .then(response => {
+        console.log('ICD response status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('ICD response data:', data);
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = 'Generate ICD11 Codes <i class="fas fa-code"></i>';
+        
+        if (data.success) {
+            console.log('ICD11 codes generated successfully:', data);
+            displayICD11Results(data.icd_codes, data.analysis_notes);
+        } else {
+            console.error('Failed to generate ICD11 codes:', data.error);
+            resultsContainer.innerHTML = `
+                <div class="error-state">
+                    <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    <h3>Error Generating ICD Codes</h3>
+                    <p>${data.error || 'Unknown error occurred'}</p>
+                    <button class="btn-secondary" onclick="document.getElementById('icd-results').style.display='none'">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = 'Generate ICD11 Codes <i class="fas fa-code"></i>';
+        
+        console.error('Error generating ICD11 codes:', error);
+        resultsContainer.innerHTML = `
+            <div class="error-state">
+                <i class="fas fa-exclamation-triangle fa-2x"></i>
+                <h3>Network Error</h3>
+                <p>Error generating ICD11 codes: ${error.message}</p>
+                <button class="btn-secondary" onclick="document.getElementById('icd-results').style.display='none'">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        `;
+    });
+}
+
+function displayICD11Results(icdCodes, analysisNotes) {
+    const resultsContainer = document.getElementById('icd-results');
+    
+    if (!icdCodes || icdCodes.length === 0) {
+        resultsContainer.innerHTML = `
+            <div class="error-state">
+                <i class="fas fa-exclamation-triangle fa-2x"></i>
+                <h3>No ICD Codes Generated</h3>
+                <p>No ICD codes were generated from the clinical summary.</p>
+                <button class="btn-secondary" onclick="document.getElementById('icd-results').style.display='none'">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = `
+        <div class="icd-results-header">
+            <h3><i class="fas fa-file-medical-alt"></i> ICD-11 Diagnostic Codes</h3>
+            <p class="results-info">Generated ${icdCodes.length} ICD-11 codes based on clinical analysis</p>
+        </div>
+        
+        <div class="icd-codes-container">
+    `;
+    
+    icdCodes.forEach((code, index) => {
+        const confidenceClass = getConfidenceClass(code.confidence);
+        html += `
+            <div class="icd-code-card">
+                <div class="code-header">
+                    <div class="code-number">${index + 1}</div>
+                    <div class="code-info">
+                        <div class="icd-code">${code.code}</div>
+                        <div class="confidence-badge ${confidenceClass}">
+                            <i class="fas fa-chart-line"></i>
+                            ${code.confidence}% confidence
+                        </div>
+                    </div>
+                </div>
+                <div class="code-content">
+                    <h4 class="code-title">${code.title}</h4>
+                    <p class="code-description">${code.description}</p>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    
+    // Add analysis notes if available
+    if (analysisNotes && analysisNotes.trim() !== '') {
+        html += `
+            <div class="analysis-notes">
+                <h4><i class="fas fa-lightbulb"></i> Clinical Analysis Notes</h4>
+                <p>${analysisNotes}</p>
+            </div>
+        `;
+    }
+    
+    // Add action buttons
+    html += `
+        <div class="results-actions">
+            <button type="button" class="btn-secondary" onclick="document.getElementById('icd-results').style.display='none'">
+                <i class="fas fa-times"></i> Close Results
+            </button>
+    `;
+    
+    // Add differential questioning button if more than 2 codes
+    if (icdCodes.length > 2) {
+        html += `
+            <button type="button" class="btn-primary" onclick="startDifferentialQuestioning()" id="start-differential-btn">
+                <i class="fas fa-question-circle"></i> Start Differential Questions (${icdCodes.length} → 2 codes)
+            </button>
+        `;
+    } else {
+        html += `
+            <button type="button" class="btn-primary" onclick="completeAssessment()">
+                <i class="fas fa-check"></i> Complete Assessment
+            </button>
+        `;
+    }
+    
+    html += '</div>';
+    
+    // Add differential questioning section (initially hidden)
+    html += `
+        <div id="differential-questioning" class="differential-questioning-section" style="display: none;">
+            <div class="differential-header">
+                <h4><i class="fas fa-stethoscope"></i> Differential Diagnosis Questions</h4>
+                <p>Answer targeted medical questions to narrow down to the 2 most likely ICD codes</p>
+                <div class="progress-info">
+                    <span id="remaining-count">${icdCodes.length}</span> codes remaining → Target: 2 codes
+                </div>
+            </div>
+            
+            <div id="current-question" class="question-container" style="display: none;">
+                <div class="question-content">
+                    <h5 id="question-text"></h5>
+                    <div id="question-reasoning" class="question-reasoning"></div>
+                </div>
+                
+                <div id="answer-options" class="answer-options">
+                    <!-- Options will be populated dynamically -->
+                </div>
+                
+                <div class="question-actions">
+                    <button type="button" class="btn-primary" onclick="submitAnswer()" id="submit-answer-btn" disabled>
+                        <i class="fas fa-paper-plane"></i> Submit Answer
+                    </button>
+                </div>
+            </div>
+            
+            <div id="elimination-history" class="elimination-history">
+                <h5><i class="fas fa-history"></i> Elimination History</h5>
+                <div id="elimination-list"></div>
+            </div>
+        </div>
+    `;
+    
+    resultsContainer.innerHTML = html;
+    resultsContainer.style.display = 'block';
+    
+    // Store current codes globally for differential questioning
+    window.currentICDCodes = icdCodes;
+    window.eliminationHistory = [];
+    
+    console.log(`Displayed ${icdCodes.length} ICD codes`);
+}
+
+function getConfidenceClass(confidence) {
+    if (confidence >= 90) return 'confidence-high';
+    if (confidence >= 70) return 'confidence-medium';
+    return 'confidence-low';
+}
+
+function completeAssessment() {
+    const confirmed = confirm('Are you ready to complete the assessment? This will save your clinical summary and finish the diagnostic process.');
+    
+    if (confirmed) {
+        // Save the completion status
+        fetch('/complete_assessment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                step: 7,
+                assessment_completed: true
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Assessment completed successfully! Thank you for using Care Diagnostics.');
+                window.location.href = '/';
+            } else {
+                showError('Failed to complete assessment: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error completing assessment:', error);
+            showError('Error completing assessment: ' + error.message);
+        });
+    }
+}
+
+function showError(message) {
+    // You can implement a more sophisticated error display here
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'alert alert-error';
+    errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+    
+    // Insert at the top of the container
+    const container = document.querySelector('.icd-container');
+    container.insertBefore(errorDiv, container.firstChild);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (errorDiv.parentNode) {
+            errorDiv.remove();
+        }
+    }, 5000);
+}
+
+function showSuccess(message) {
+    const successDiv = document.createElement('div');
+    successDiv.className = 'alert alert-success';
+    successDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+    
+    // Insert at the top of the container
+    const container = document.querySelector('.icd-container');
+    container.insertBefore(successDiv, container.firstChild);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        if (successDiv.parentNode) {
+            successDiv.remove();
+        }
+    }, 3000);
+}
+
+// Differential Questioning Functions
+let currentQuestion = null;
+let selectedAnswer = null;
+let questionGenerationAttempts = 0;
+let maxQuestionAttempts = 10; // Prevent infinite loops
+
+function startDifferentialQuestioning() {
+    console.log('Starting differential questioning...');
+    
+    // Reset attempt counter
+    questionGenerationAttempts = 0;
+    
+    const questioningSection = document.getElementById('differential-questioning');
+    const startBtn = document.getElementById('start-differential-btn');
+    
+    questioningSection.style.display = 'block';
+    startBtn.disabled = true;
+    startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting...';
+    
+    // Generate first question
+    generateDifferentialQuestion();
+}
+
+function generateDifferentialQuestion() {
+    console.log('Generating differential question...');
+    
+    // Increment attempt counter
+    questionGenerationAttempts++;
+    console.log(`🔢 Question generation attempt: ${questionGenerationAttempts}/${maxQuestionAttempts}`);
+    
+    // Check if we've exceeded max attempts
+    if (questionGenerationAttempts > maxQuestionAttempts) {
+        console.error('❌ Max question generation attempts exceeded!');
+        showError('Too many attempts to generate questions. Finishing with current codes.');
+        finishDifferentialQuestioning();
+        return;
+    }
+    
+    if (window.currentICDCodes.length <= 2) {
+        console.log('Target reached: 2 or fewer codes remaining');
+        finishDifferentialQuestioning();
+        return;
+    }
+    
+    const clinicalSummary = document.getElementById('clinical-summary-text').value;
+    
+    // Get comprehensive patient data summary
+    fetch('/get_patient_data_summary')
+    .then(response => response.json())
+    .then(patientDataResponse => {
+        let patientDataSummary = "Basic patient information";
+        
+        if (patientDataResponse.success) {
+            patientDataSummary = patientDataResponse.patient_data_summary;
+            console.log('Patient data summary loaded:', patientDataSummary.length, 'characters');
+        } else {
+            console.warn('Failed to load patient data summary:', patientDataResponse.error);
+        }
+        
+        // Now generate the differential question with full context
+        fetch('/generate_differential_question', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                icd_codes: window.currentICDCodes,
+                clinical_summary: clinicalSummary,
+                patient_data_summary: patientDataSummary,
+                elimination_history: window.eliminationHistory
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayDifferentialQuestion(data);
+            } else {
+                console.error('Failed to generate question:', data.error);
+                showError('Failed to generate differential question: ' + data.error);
+                
+                // Re-enable start button on error
+                resetDifferentialButton('Failed to generate question');
+            }
+        })
+        .catch(error => {
+            console.error('Error generating question:', error);
+            showError('Error generating differential question: ' + error.message);
+            
+            // Re-enable start button on error  
+            resetDifferentialButton('Network error occurred');
+        });
+    })
+    .catch(error => {
+        console.warn('Error loading patient data summary:', error);
+        
+        // Proceed without patient data summary
+        const patientDataSummary = "Patient data unavailable";
+        
+        fetch('/generate_differential_question', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                icd_codes: window.currentICDCodes,
+                clinical_summary: clinicalSummary,
+                patient_data_summary: patientDataSummary,
+                elimination_history: window.eliminationHistory
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayDifferentialQuestion(data);
+            } else {
+                console.error('Failed to generate question:', data.error);
+                showError('Failed to generate differential question: ' + data.error);
+                
+                // Re-enable start button on error  
+                resetDifferentialButton('Failed to generate question');
+            }
+        })
+        .catch(error => {
+            console.error('Error generating question:', error);
+            showError('Error generating differential question: ' + error.message);
+            
+            // Re-enable start button on error  
+            resetDifferentialButton('Network error occurred');
+        });
+    });
+}
+
+function displayDifferentialQuestion(questionData) {
+    console.log('Displaying differential question:', questionData);
+    
+    currentQuestion = questionData;
+    selectedAnswer = null;
+    
+    const questionContainer = document.getElementById('current-question');
+    const questionText = document.getElementById('question-text');
+    const questionReasoning = document.getElementById('question-reasoning');
+    const answerOptions = document.getElementById('answer-options');
+    const submitBtn = document.getElementById('submit-answer-btn');
+    
+    questionText.textContent = questionData.question;
+    questionReasoning.innerHTML = `<strong>Clinical Focus:</strong> ${questionData.reasoning}`;
+    
+    // Generate answer options
+    let optionsHTML = '';
+    questionData.answer_options.forEach((option, index) => {
+        optionsHTML += `
+            <label class="answer-option">
+                <input type="radio" name="differential-answer" value="${option}" onchange="selectAnswer('${option}')">
+                <span class="option-text">${option}</span>
+            </label>
+        `;
+    });
+    
+    answerOptions.innerHTML = optionsHTML;
+    questionContainer.style.display = 'block';
+    submitBtn.disabled = true;
+    
+    // Update remaining count
+    document.getElementById('remaining-count').textContent = window.currentICDCodes.length;
+}
+
+function selectAnswer(answer) {
+    selectedAnswer = answer;
+    document.getElementById('submit-answer-btn').disabled = false;
+}
+
+function submitAnswer() {
+    if (!selectedAnswer || !currentQuestion) {
+        showError('Please select an answer before submitting');
+        return;
+    }
+    
+    console.log('Submitting answer:', selectedAnswer);
+    
+    const submitBtn = document.getElementById('submit-answer-btn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    
+    const clinicalSummary = document.getElementById('clinical-summary-text').value;
+    
+    fetch('/process_differential_answer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            answer: selectedAnswer,
+            question: currentQuestion.question,
+            icd_codes: window.currentICDCodes,
+            target_code_to_eliminate: currentQuestion.target_code_to_eliminate,
+            clinical_summary: clinicalSummary
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            processEliminationResult(data);
+        } else {
+            console.error('Failed to process answer:', data.error);
+            showError('Failed to process answer: ' + data.error);
+            
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Answer';
+        }
+    })
+    .catch(error => {
+        console.error('Error processing answer:', error);
+        showError('Error processing answer: ' + error.message);
+        
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Answer';
+    });
+}
+
+function processEliminationResult(data) {
+    console.log('Processing elimination result:', data);
+    
+    // Log current state before update
+    console.log('🔍 BEFORE elimination:');
+    console.log('  - Current codes count:', window.currentICDCodes.length);
+    console.log('  - Current codes:', window.currentICDCodes.map(c => c.code));
+    
+    if (!data.success) {
+        console.error('❌ Elimination failed:', data.error);
+        showError('Elimination failed: ' + data.error);
+        
+        // Reset submit button
+        const submitBtn = document.getElementById('submit-answer-btn');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Answer';
+        return;
+    }
+    
+    // Verify elimination data
+    console.log('🔍 Elimination data received:');
+    console.log('  - Eliminated code:', data.eliminated_code);
+    console.log('  - Updated codes count:', data.updated_icd_codes ? data.updated_icd_codes.length : 'undefined');
+    console.log('  - Remaining count:', data.remaining_count);
+    
+    if (!data.updated_icd_codes || data.updated_icd_codes.length === window.currentICDCodes.length) {
+        console.error('❌ No codes were actually eliminated!');
+        console.log('  - Original count:', window.currentICDCodes.length);
+        console.log('  - Updated count:', data.updated_icd_codes ? data.updated_icd_codes.length : 'undefined');
+        
+        showError('No codes were eliminated. There may be an issue with the elimination process.');
+        
+        // Reset submit button
+        const submitBtn = document.getElementById('submit-answer-btn');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Answer';
+        return;
+    }
+    
+    // Update current codes
+    const oldCount = window.currentICDCodes.length;
+    window.currentICDCodes = data.updated_icd_codes;
+    const newCount = window.currentICDCodes.length;
+    
+    console.log('🔍 AFTER elimination:');
+    console.log('  - Updated codes count:', newCount);
+    console.log('  - Updated codes:', window.currentICDCodes.map(c => c.code));
+    console.log('  - Count change:', oldCount, '->', newCount);
+    
+    // Verify count decreased by exactly 1
+    if (newCount !== oldCount - 1) {
+        console.error('❌ Unexpected count change!', 'Expected:', oldCount - 1, 'Got:', newCount);
+        showError(`Unexpected elimination result. Expected ${oldCount - 1} codes, but got ${newCount} codes.`);
+    }
+    
+    // Add to elimination history
+    const eliminationEntry = {
+        eliminated_code: data.eliminated_code,
+        reasoning: data.reasoning,
+        question: currentQuestion.question,
+        answer: selectedAnswer
+    };
+    window.eliminationHistory.push(eliminationEntry);
+    
+    console.log('📝 Added to elimination history:', eliminationEntry);
+    console.log('📚 Total elimination history entries:', window.eliminationHistory.length);
+    
+    // Update elimination history display
+    updateEliminationHistory();
+    
+    // Update remaining count display
+    document.getElementById('remaining-count').textContent = newCount;
+    
+    // Update ICD codes display
+    updateICDCodesDisplay();
+    
+    // Hide current question
+    document.getElementById('current-question').style.display = 'none';
+    
+    // Reset submit button
+    const submitBtn = document.getElementById('submit-answer-btn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Answer';
+    
+    // Show success message
+    showSuccess(`Eliminated: ${data.eliminated_code} - ${data.reasoning}`);
+    
+    // Continue or finish based on actual count
+    console.log('🤔 Deciding next action:');
+    console.log('  - Current count:', newCount);
+    console.log('  - Target count: 2');
+    
+    setTimeout(() => {
+        if (newCount <= 2) {
+            console.log('✅ Target reached! Finishing differential questioning.');
+            finishDifferentialQuestioning();
+        } else {
+            console.log('🔄 Continuing with next question...');
+            try {
+                generateDifferentialQuestion();
+            } catch (error) {
+                console.error('❌ Error generating next question:', error);
+                resetDifferentialButton('Error generating next question: ' + error.message);
+                showError('Error continuing differential questioning: ' + error.message);
+            }
+        }
+    }, 2000);
+}
+
+function updateEliminationHistory() {
+    const historyContainer = document.getElementById('elimination-list');
+    
+    let historyHTML = '';
+    window.eliminationHistory.forEach((entry, index) => {
+        historyHTML += `
+            <div class="elimination-entry">
+                <div class="elimination-header">
+                    <span class="elimination-number">#${index + 1}</span>
+                    <span class="eliminated-code">${entry.eliminated_code}</span>
+                </div>
+                <div class="elimination-details">
+                    <div class="question-asked"><strong>Q:</strong> ${entry.question}</div>
+                    <div class="answer-given"><strong>A:</strong> ${entry.answer}</div>
+                    <div class="reasoning"><strong>Reasoning:</strong> ${entry.reasoning}</div>
+                </div>
+            </div>
+        `;
+    });
+    
+    historyContainer.innerHTML = historyHTML;
+}
+
+function updateICDCodesDisplay() {
+    // Update the main ICD codes display with remaining codes
+    const codesContainer = document.querySelector('.icd-codes-container');
+    
+    let html = '';
+    window.currentICDCodes.forEach((code, index) => {
+        const confidenceClass = getConfidenceClass(code.confidence);
+        html += `
+            <div class="icd-code-card">
+                <div class="code-header">
+                    <div class="code-number">${index + 1}</div>
+                    <div class="code-info">
+                        <div class="icd-code">${code.code}</div>
+                        <div class="confidence-badge ${confidenceClass}">
+                            <i class="fas fa-chart-line"></i>
+                            ${code.confidence}% confidence
+                        </div>
+                    </div>
+                </div>
+                <div class="code-content">
+                    <h4 class="code-title">${code.title}</h4>
+                    <p class="code-description">${code.description}</p>
+                </div>
+            </div>
+        `;
+    });
+    
+    codesContainer.innerHTML = html;
+}
+
+function finishDifferentialQuestioning() {
+    console.log('Finishing differential questioning...');
+    
+    const questioningSection = document.getElementById('differential-questioning');
+    const startBtn = document.getElementById('start-differential-btn');
+    
+    // Hide questioning section
+    document.getElementById('current-question').style.display = 'none';
+    
+    // Show completion message
+    const completionMessage = document.createElement('div');
+    completionMessage.className = 'differential-completion';
+    completionMessage.innerHTML = `
+        <div class="completion-content">
+            <i class="fas fa-check-circle fa-2x text-success"></i>
+            <h4>Differential Diagnosis Complete!</h4>
+            <p>Successfully narrowed down to ${window.currentICDCodes.length} most likely ICD codes.</p>
+            <div class="completion-actions">
+                <button type="button" class="btn-primary" onclick="generateDiagnosticTests()">
+                    <i class="fas fa-flask"></i> Generate Diagnostic Tests
+                </button>
+                <button type="button" class="btn-secondary" onclick="completeAssessment()">
+                    <i class="fas fa-flag-checkered"></i> Complete Assessment
+                </button>
+            </div>
+        </div>
+    `;
+    
+    questioningSection.appendChild(completionMessage);
+    
+    // Update start button to show completion
+    if (startBtn) {
+        startBtn.innerHTML = '<i class="fas fa-check"></i> Differential Complete';
+        startBtn.disabled = true;
+    }
+    
+    // Show final success message
+    showSuccess(`Differential diagnosis complete! Narrowed down to ${window.currentICDCodes.length} codes.`);
+}
+
+function resetDifferentialButton(errorMessage) {
+    console.log('🔧 Resetting differential button due to:', errorMessage);
+    
+    const startBtn = document.getElementById('start-differential-btn');
+    if (startBtn) {
+        const currentCount = window.currentICDCodes ? window.currentICDCodes.length : 0;
+        
+        if (currentCount > 2) {
+            startBtn.disabled = false;
+            startBtn.innerHTML = `<i class="fas fa-question-circle"></i> Continue Questions (${currentCount} → 2 codes)`;
+        } else {
+            startBtn.disabled = true;
+            startBtn.innerHTML = '<i class="fas fa-check"></i> Target Reached';
+        }
+    }
+    
+    // Also hide any current question display
+    const questionContainer = document.getElementById('current-question');
+    if (questionContainer) {
+        questionContainer.style.display = 'none';
+    }
+}
+
+// Diagnostic Tests Functions
+function generateDiagnosticTests() {
+    console.log('🧪 Generating diagnostic tests recommendations...');
+    
+    if (!window.currentICDCodes || window.currentICDCodes.length === 0) {
+        showError('No ICD codes available for diagnostic test generation');
+        return;
+    }
+    
+    const clinicalSummary = document.getElementById('clinical-summary-text').value;
+    
+    // Show loading state
+    showDiagnosticTestsLoading();
+    
+    // Get comprehensive patient data summary first
+    fetch('/get_patient_data_summary')
+    .then(response => response.json())
+    .then(patientDataResponse => {
+        let patientDataSummary = "Basic patient information";
+        
+        if (patientDataResponse.success) {
+            patientDataSummary = patientDataResponse.patient_data_summary;
+            console.log('Patient data summary loaded for tests:', patientDataSummary.length, 'characters');
+        } else {
+            console.warn('Failed to load patient data summary for tests:', patientDataResponse.error);
+        }
+        
+        // Generate diagnostic tests with full context
+        fetch('/generate_diagnostic_tests', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                icd_codes: window.currentICDCodes,
+                clinical_summary: clinicalSummary,
+                patient_data_summary: patientDataSummary,
+                elimination_history: window.eliminationHistory || []
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayDiagnosticTests(data);
+            } else {
+                console.error('Failed to generate diagnostic tests:', data.error);
+                showError('Failed to generate diagnostic tests: ' + data.error);
+                hideDiagnosticTestsLoading();
+            }
+        })
+        .catch(error => {
+            console.error('Error generating diagnostic tests:', error);
+            showError('Error generating diagnostic tests: ' + error.message);
+            hideDiagnosticTestsLoading();
+        });
+    })
+    .catch(error => {
+        console.warn('Error loading patient data summary for tests:', error);
+        
+        // Proceed without patient data summary
+        fetch('/generate_diagnostic_tests', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                icd_codes: window.currentICDCodes,
+                clinical_summary: clinicalSummary,
+                patient_data_summary: "Patient data unavailable",
+                elimination_history: window.eliminationHistory || []
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayDiagnosticTests(data);
+            } else {
+                console.error('Failed to generate diagnostic tests:', data.error);
+                showError('Failed to generate diagnostic tests: ' + data.error);
+                hideDiagnosticTestsLoading();
+            }
+        })
+        .catch(error => {
+            console.error('Error generating diagnostic tests:', error);
+            showError('Error generating diagnostic tests: ' + error.message);
+            hideDiagnosticTestsLoading();
+        });
+    });
+}
+
+function showDiagnosticTestsLoading() {
+    // Create or get diagnostic tests container
+    let testsContainer = document.getElementById('diagnostic-tests-results');
+    if (!testsContainer) {
+        testsContainer = document.createElement('div');
+        testsContainer.id = 'diagnostic-tests-results';
+        testsContainer.className = 'diagnostic-tests-section';
+        
+        // Insert after differential questioning section
+        const questioningSection = document.getElementById('differential-questioning');
+        questioningSection.parentNode.insertBefore(testsContainer, questioningSection.nextSibling);
+    }
+    
+    testsContainer.innerHTML = `
+        <div class="tests-loading-state">
+            <div class="loading-spinner">
+                <i class="fas fa-flask fa-spin fa-2x"></i>
+            </div>
+            <h3>Generating Diagnostic Tests Recommendations...</h3>
+            <p>Analyzing narrowed ICD codes and generating targeted diagnostic tests...</p>
+        </div>
+    `;
+    testsContainer.style.display = 'block';
+}
+
+function hideDiagnosticTestsLoading() {
+    const testsContainer = document.getElementById('diagnostic-tests-results');
+    if (testsContainer) {
+        testsContainer.style.display = 'none';
+    }
+}
+
+function displayDiagnosticTests(testsData) {
+    console.log('📊 Displaying diagnostic tests:', testsData);
+    
+    const testsContainer = document.getElementById('diagnostic-tests-results');
+    
+    if (!testsData.diagnostic_tests || testsData.diagnostic_tests.length === 0) {
+        testsContainer.innerHTML = `
+            <div class="tests-error-state">
+                <i class="fas fa-exclamation-triangle fa-2x"></i>
+                <h3>No Diagnostic Tests Generated</h3>
+                <p>No diagnostic tests were generated for the current ICD codes.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = `
+        <div class="diagnostic-tests-header">
+            <h3><i class="fas fa-flask"></i> Recommended Diagnostic Tests</h3>
+            <p class="tests-info">Based on ${window.currentICDCodes.length} narrowed ICD codes from differential diagnosis</p>
+        </div>
+    `;
+    
+    // Show priority tests first
+    if (testsData.priority_tests && testsData.priority_tests.length > 0) {
+        html += `
+            <div class="priority-tests-section">
+                <h4><i class="fas fa-exclamation-circle text-danger"></i> Priority Tests (Immediate)</h4>
+                <div class="priority-tests-list">
+        `;
+        
+        testsData.priority_tests.forEach((test, index) => {
+            html += `<span class="priority-test-item">${test}</span>`;
+        });
+        
+        html += `
+                </div>
+            </div>
+        `;
+    }
+    
+    // Group tests by category
+    const testsByCategory = {};
+    testsData.diagnostic_tests.forEach(test => {
+        const category = test.category || 'Other';
+        if (!testsByCategory[category]) {
+            testsByCategory[category] = [];
+        }
+        testsByCategory[category].push(test);
+    });
+    
+    html += '<div class="diagnostic-tests-container">';
+    
+    Object.keys(testsByCategory).forEach(category => {
+        html += `
+            <div class="test-category-section">
+                <h4><i class="fas ${getCategoryIcon(category)}"></i> ${category} Tests</h4>
+                <div class="tests-in-category">
+        `;
+        
+        testsByCategory[category].forEach((test, index) => {
+            const urgencyClass = getUrgencyClass(test.urgency);
+            const costClass = getCostClass(test.cost_tier);
+            
+            html += `
+                <div class="diagnostic-test-card">
+                    <div class="test-header">
+                        <h5 class="test-name">${test.test_name}</h5>
+                        <div class="test-badges">
+                            <span class="urgency-badge ${urgencyClass}">${test.urgency}</span>
+                            <span class="cost-badge ${costClass}">${test.cost_tier} Cost</span>
+                        </div>
+                    </div>
+                    <div class="test-content">
+                        <div class="test-reasoning">
+                            <strong>Clinical Reasoning:</strong> ${test.reasoning}
+                        </div>
+                        <div class="expected-findings">
+                            <strong>Expected Findings:</strong> ${test.expected_findings}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div></div>';
+    });
+    
+    html += '</div>';
+    
+    // Add clinical insights
+    if (testsData.reasoning) {
+        html += `
+            <div class="tests-reasoning-section">
+                <h4><i class="fas fa-lightbulb"></i> Clinical Strategy</h4>
+                <p>${testsData.reasoning}</p>
+            </div>
+        `;
+    }
+    
+    if (testsData.estimated_timeline) {
+        html += `
+            <div class="tests-timeline-section">
+                <h4><i class="fas fa-clock"></i> Estimated Timeline</h4>
+                <p>${testsData.estimated_timeline}</p>
+            </div>
+        `;
+    }
+    
+    if (testsData.cost_considerations) {
+        html += `
+            <div class="tests-cost-section">
+                <h4><i class="fas fa-dollar-sign"></i> Cost Considerations</h4>
+                <p>${testsData.cost_considerations}</p>
+            </div>
+        `;
+    }
+    
+    if (testsData.clinical_notes) {
+        html += `
+            <div class="tests-notes-section">
+                <h4><i class="fas fa-sticky-note"></i> Clinical Notes</h4>
+                <p>${testsData.clinical_notes}</p>
+            </div>
+        `;
+    }
+    
+    // Add action buttons
+    html += `
+        <div class="tests-actions">
+            <button type="button" class="btn-secondary" onclick="document.getElementById('diagnostic-tests-results').style.display='none'">
+                <i class="fas fa-times"></i> Close Tests
+            </button>
+            <button type="button" class="btn-primary" onclick="completeAssessment()">
+                <i class="fas fa-check"></i> Complete Assessment
+            </button>
+        </div>
+    `;
+    
+    testsContainer.innerHTML = html;
+    testsContainer.style.display = 'block';
+    
+    console.log(`✅ Displayed ${testsData.diagnostic_tests.length} diagnostic tests`);
+    showSuccess('Diagnostic tests recommendations generated successfully!');
+}
+
+function getCategoryIcon(category) {
+    const icons = {
+        'Laboratory': 'fa-vial',
+        'Imaging': 'fa-x-ray',
+        'Cardiology': 'fa-heartbeat',
+        'Pulmonary': 'fa-lungs',
+        'Endoscopy': 'fa-search',
+        'Biopsy': 'fa-microscope',
+        'Other': 'fa-stethoscope'
+    };
+    return icons[category] || 'fa-stethoscope';
+}
+
+function getUrgencyClass(urgency) {
+    if (!urgency) return 'urgency-normal';
+    const urgencyLower = urgency.toLowerCase();
+    if (urgencyLower.includes('immediate') || urgencyLower.includes('stat')) {
+        return 'urgency-immediate';
+    } else if (urgencyLower.includes('24h') || urgencyLower.includes('urgent')) {
+        return 'urgency-urgent';
+    } else if (urgencyLower.includes('week')) {
+        return 'urgency-week';
+    }
+    return 'urgency-normal';
+}
+
+function getCostClass(costTier) {
+    if (!costTier) return 'cost-medium';
+    const costLower = costTier.toLowerCase();
+    if (costLower.includes('low')) {
+        return 'cost-low';
+    } else if (costLower.includes('high')) {
+        return 'cost-high';
+    }
+    return 'cost-medium';
+}
+</script>
+{% endblock %}

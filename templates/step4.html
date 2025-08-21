@@ -1,0 +1,2346 @@
+{% extends "base.html" %}
+
+{% block title %}Medical Records & Contact - Step 4 - Care Diagnostics{% endblock %}
+
+{% block content %}
+<div class="step-container">
+    <div class="step-header">
+        <h2><i class="fas fa-file-medical"></i> Step 4: Medical Records & Contact Information</h2>
+        <p>Upload medical reports, capture medicine information, and provide contact details</p>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 66.67%"></div>
+        </div>
+    </div>
+
+    <form id="medicalForm" class="medical-form" novalidate>
+        
+        <!-- Pagination Controls -->
+        <div class="pagination-controls">
+            <div class="pagination-dots">
+                <div class="dot active" data-section="1">
+                    <span class="dot-number">1</span>
+                    <span class="dot-label">Contact & Emergency Info</span>
+                </div>
+                <div class="dot" data-section="2">
+                    <span class="dot-number">2</span>
+                    <span class="dot-label">Medical Reports</span>
+                </div>
+                <div class="dot" data-section="3">
+                    <span class="dot-number">3</span>
+                    <span class="dot-label">Current Medications</span>
+                </div>
+                <div class="dot" data-section="4">
+                    <span class="dot-number">4</span>
+                    <span class="dot-label">AI Follow-up Questions</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: Contact & Emergency Information -->
+        <div class="form-section-page" id="section-1" style="display: block;">
+        
+        <!-- Patient Information Display -->
+        <div class="form-section patient-info-section">
+            <h3><i class="fas fa-user"></i> Patient Information</h3>
+            <div class="patient-display">
+                <div class="patient-name-display">
+                    <label>Patient Name:</label>
+                    <div class="patient-name" id="patient-name-display">{{ patient_name or "Patient" }}</div>
+                </div>
+                <div class="patient-details">
+                    <span class="patient-age">Age: {{ patient_age or "Unknown" }}</span>
+                    <span class="patient-gender">Gender: {{ patient_gender or "Unknown" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Information Section -->
+        <div class="form-section contact-section">
+            <h3><i class="fas fa-phone"></i> Contact Information</h3>
+            <p class="section-description">Primary contact details for the patient</p>
+            
+            <div class="vitals-subsection">
+                <h4><i class="fas fa-address-book"></i> Primary Contact</h4>
+                <div class="vitals-grid">
+                    <div class="form-group vital-input">
+                        <label for="phone_primary">Primary Phone Number *</label>
+                        <input type="tel" id="phone_primary" name="phone_primary" required placeholder="e.g., +91 9876543210">
+                        <div class="vital-range">Main contact number</div>
+                    </div>
+                    <div class="form-group vital-input">
+                        <label for="phone_secondary">Secondary Phone Number</label>
+                        <input type="tel" id="phone_secondary" name="phone_secondary" placeholder="e.g., +91 9876543211">
+                        <div class="vital-range">Alternative contact number</div>
+                    </div>
+                </div>
+                
+                <div class="vitals-grid">
+                    <div class="form-group vital-input">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="e.g., patient@example.com">
+                        <div class="vital-range">For reports and communication</div>
+                    </div>
+                    <div class="form-group vital-input" id="emr-link-group" style="display: none;">
+                        <label for="emr_link">EMR Link *</label>
+                        <input type="url" id="emr_link" name="emr_link" placeholder="e.g., https://emr.hospital.com/patient/123" required>
+                        <div class="vital-range" id="emr-status">EMR link is required</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emergency Contact Section -->
+        <div class="form-section emergency-section">
+            <h3><i class="fas fa-ambulance"></i> Emergency Contact Information</h3>
+            <p class="section-description">Contact person in case of emergency</p>
+            
+            <div class="vitals-subsection">
+                <h4><i class="fas fa-user-plus"></i> Emergency Contact</h4>
+                <div class="vitals-grid">
+                    <div class="form-group vital-input">
+                        <label for="emergency_name">Emergency Contact Name *</label>
+                        <input type="text" id="emergency_name" name="emergency_name" required placeholder="e.g., John Doe">
+                        <div class="vital-range">Full name of emergency contact</div>
+                    </div>
+                    <div class="form-group vital-input">
+                        <label>Relationship *</label>
+                        <div class="radio-button-group">
+                            <div class="radio-row">
+                                <label class="radio-option"><input type="radio" name="emergency_relation" value="spouse" required> Spouse</label>
+                                <label class="radio-option"><input type="radio" name="emergency_relation" value="parent" required> Parent</label>
+                                <label class="radio-option"><input type="radio" name="emergency_relation" value="child" required> Child</label>
+                            </div>
+                            <div class="radio-row">
+                                <label class="radio-option"><input type="radio" name="emergency_relation" value="sibling" required> Sibling</label>
+                                <label class="radio-option"><input type="radio" name="emergency_relation" value="relative" required> Relative</label>
+                                <label class="radio-option"><input type="radio" name="emergency_relation" value="other" required> Other</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="vitals-grid">
+                    <div class="form-group vital-input">
+                        <label for="emergency_phone_primary">Emergency Phone 1 *</label>
+                        <input type="tel" id="emergency_phone_primary" name="emergency_phone_primary" required placeholder="e.g., +91 9876543210">
+                        <div class="vital-range">Primary emergency contact number</div>
+                    </div>
+                    <div class="form-group vital-input">
+                        <label for="emergency_phone_secondary">Emergency Phone 2</label>
+                        <input type="tel" id="emergency_phone_secondary" name="emergency_phone_secondary" placeholder="e.g., +91 9876543211">
+                        <div class="vital-range">Secondary emergency contact number</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Navigation for Section 1 -->
+        <div class="section-navigation">
+            <button type="button" class="btn-navigation btn-prev" style="visibility: hidden;" disabled>
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <button type="button" class="btn-navigation btn-next" onclick="nextSection()">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+        
+        </div>
+        <!-- End Section 1 -->
+
+        <!-- Section 2: Medical Reports -->
+        <div class="form-section-page" id="section-2" style="display: none;">
+
+        <!-- Laboratory Test Reports Section -->
+        <div class="form-section lab-reports-section">
+            <h3><i class="fas fa-flask"></i> Laboratory Test Reports with AI Analysis</h3>
+            <p class="section-description">Upload laboratory reports for automated medical analysis and insights</p>
+            
+            <div class="vitals-subsection">
+                <h4><i class="fas fa-vial"></i> Lab Report Upload & Analysis</h4>
+                <div class="vitals-grid">
+                    <div class="form-group file-input">
+                        <label for="lab_report_file">Laboratory Report</label>
+                        <input type="file" id="lab_report_file" name="lab_report_file" accept="image/*,application/pdf">
+                        <div class="file-hint">Upload lab report (PDF, Image)</div>
+                        <div class="upload-status" id="lab_upload_status"></div>
+                    </div>
+                    <div class="form-group vital-input">
+                        <label>Report Type</label>
+                        <div class="radio-button-group">
+                            <div class="radio-row">
+                                <label class="radio-option"><input type="radio" name="lab_report_type" value="cbc"> CBC</label>
+                                <label class="radio-option"><input type="radio" name="lab_report_type" value="blood_sugar"> Blood Sugar</label>
+                                <label class="radio-option"><input type="radio" name="lab_report_type" value="lipid_profile"> Lipid</label>
+                                <label class="radio-option"><input type="radio" name="lab_report_type" value="liver_function"> Liver</label>
+                                <label class="radio-option"><input type="radio" name="lab_report_type" value="kidney_function"> Kidney</label>
+                            </div>
+                            <div class="radio-row">
+                                <label class="radio-option"><input type="radio" name="lab_report_type" value="thyroid"> Thyroid</label>
+                                <label class="radio-option"><input type="radio" name="lab_report_type" value="vitamin_levels"> Vitamins</label>
+                                <label class="radio-option"><input type="radio" name="lab_report_type" value="electrolytes"> Electrolytes</label>
+                                <label class="radio-option"><input type="radio" name="lab_report_type" value="urine_analysis"> Urine</label>
+                                <label class="radio-option"><input type="radio" name="lab_report_type" value="other"> Other</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI Insights for Lab Reports -->
+                <div class="ai-insights-container" id="lab_insights_container" style="display: none;">
+                    <div class="insights-header">
+                        <h5><i class="fas fa-brain"></i> AI Medical Insights - Lab Report Analysis</h5>
+                        <div class="insights-loader" id="lab_insights_loader">
+                            <i class="fas fa-spinner fa-spin"></i> Analyzing report...
+                        </div>
+                    </div>
+                    <div class="insights-content" id="lab_insights_content"></div>
+                    <input type="hidden" id="lab_ai_insights" name="lab_ai_insights">
+                </div>
+            </div>
+        </div>
+
+        <!-- Medical Images Section -->
+        <div class="form-section medical-images-section">
+            <h3><i class="fas fa-x-ray"></i> Medical Imaging with AI Analysis</h3>
+            <p class="section-description">Upload medical imaging reports and scans for automated analysis</p>
+            
+            <div class="vitals-subsection">
+                <h4><i class="fas fa-images"></i> Medical Image Upload & Analysis</h4>
+                <div class="vitals-grid">
+                    <div class="form-group file-input">
+                        <label for="medical_image_file">Medical Image/Report</label>
+                        <input type="file" id="medical_image_file" name="medical_image_file" accept="image/*,application/pdf,.dcm,.dicom">
+                        <div class="file-hint">Upload medical image (DICOM, JPEG, PNG, PDF)</div>
+                        <div class="upload-status" id="image_upload_status"></div>
+                    </div>
+                    <div class="form-group vital-input">
+                        <label>Image Type</label>
+                        <div class="radio-button-group">
+                            <div class="radio-row">
+                                <label class="radio-option"><input type="radio" name="medical_image_type" value="xray_chest"> X-Ray Chest</label>
+                                <label class="radio-option"><input type="radio" name="medical_image_type" value="xray_bone"> X-Ray Bone</label>
+                                <label class="radio-option"><input type="radio" name="medical_image_type" value="xray_abdomen"> X-Ray Abd</label>
+                                <label class="radio-option"><input type="radio" name="medical_image_type" value="ultrasound"> Ultrasound</label>
+                            </div>
+                            <div class="radio-row">
+                                <label class="radio-option"><input type="radio" name="medical_image_type" value="mri_brain"> MRI Brain</label>
+                                <label class="radio-option"><input type="radio" name="medical_image_type" value="mri_spine"> MRI Spine</label>
+                                <label class="radio-option"><input type="radio" name="medical_image_type" value="mri_joint"> MRI Joint</label>
+                                <label class="radio-option"><input type="radio" name="medical_image_type" value="mammogram"> Mammogram</label>
+                            </div>
+                            <div class="radio-row">
+                                <label class="radio-option"><input type="radio" name="medical_image_type" value="ct_scan_head"> CT Head</label>
+                                <label class="radio-option"><input type="radio" name="medical_image_type" value="ct_scan_chest"> CT Chest</label>
+                                <label class="radio-option"><input type="radio" name="medical_image_type" value="ct_scan_abdomen"> CT Abd</label>
+                                <label class="radio-option"><input type="radio" name="medical_image_type" value="other"> Other</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI Insights for Medical Images -->
+                <div class="ai-insights-container" id="image_insights_container" style="display: none;">
+                    <div class="insights-header">
+                        <h5><i class="fas fa-brain"></i> AI Medical Insights - Image Analysis</h5>
+                        <div class="insights-loader" id="image_insights_loader">
+                            <i class="fas fa-spinner fa-spin"></i> Analyzing image...
+                        </div>
+                    </div>
+                    <div class="insights-content" id="image_insights_content"></div>
+                    <input type="hidden" id="image_ai_insights" name="image_ai_insights">
+                </div>
+            </div>
+        </div>
+
+        <!-- Pathology Reports Section -->
+        <div class="form-section pathology-section">
+            <h3><i class="fas fa-microscope"></i> Pathology & Diagnostic Reports</h3>
+            <p class="section-description">Upload pathology and diagnostic test reports for comprehensive analysis</p>
+            
+            <div class="vitals-subsection">
+                <h4><i class="fas fa-file-medical"></i> Pathology Report Upload & Analysis</h4>
+                <div class="vitals-grid">
+                    <div class="form-group file-input">
+                        <label for="pathology_report_file">Pathology Report</label>
+                        <input type="file" id="pathology_report_file" name="pathology_report_file" accept="image/*,application/pdf">
+                        <div class="file-hint">Upload pathology/diagnostic report</div>
+                        <div class="upload-status" id="pathology_upload_status"></div>
+                    </div>
+                    <div class="form-group vital-input">
+                        <label for="pathology_manual_comments">Manual Observations</label>
+                        <textarea id="pathology_manual_comments" name="pathology_manual_comments" rows="3" placeholder="Describe any observations or notes about the report..."></textarea>
+                    </div>
+                </div>
+                
+                <!-- AI Insights for Pathology -->
+                <div class="ai-insights-container" id="pathology_insights_container" style="display: none;">
+                    <div class="insights-header">
+                        <h5><i class="fas fa-brain"></i> AI Medical Insights - Pathology Analysis</h5>
+                        <div class="insights-loader" id="pathology_insights_loader">
+                            <i class="fas fa-spinner fa-spin"></i> Analyzing report...
+                        </div>
+                    </div>
+                    <div class="insights-content" id="pathology_insights_content"></div>
+                    <input type="hidden" id="pathology_ai_insights" name="pathology_ai_insights">
+                </div>
+            </div>
+        </div>
+
+        <!-- Signaling Reports Section -->
+        <div class="form-section signaling-section">
+            <h3><i class="fas fa-heartbeat"></i> Signaling Reports with AI Analysis</h3>
+            <p class="section-description">Upload ECG, EEG and other signaling reports for automated analysis</p>
+            
+            <div class="vitals-subsection">
+                <h4><i class="fas fa-chart-line"></i> Signaling Report Upload & Analysis</h4>
+                <div class="vitals-grid">
+                    <div class="form-group file-input">
+                        <label for="signaling_report_file">Signaling Report</label>
+                        <input type="file" id="signaling_report_file" name="signaling_report_file" accept="image/*,application/pdf">
+                        <div class="file-hint">Upload signaling report (ECG, EEG, etc.)</div>
+                        <div class="upload-status" id="signaling_upload_status"></div>
+                    </div>
+                    <div class="form-group vital-input">
+                        <label>Report Type</label>
+                        <div class="radio-button-group">
+                            <div class="radio-row">
+                                <label class="radio-option"><input type="radio" name="signaling_report_type" value="ecg"> ECG</label>
+                                <label class="radio-option"><input type="radio" name="signaling_report_type" value="eeg"> EEG</label>
+                                <label class="radio-option"><input type="radio" name="signaling_report_type" value="emg"> EMG</label>
+                                <label class="radio-option"><input type="radio" name="signaling_report_type" value="other"> Other</label>
+                            </div>
+                            <div class="radio-row">
+                                <label class="radio-option"><input type="radio" name="signaling_report_type" value="holter"> Holter</label>
+                                <label class="radio-option"><input type="radio" name="signaling_report_type" value="stress_test"> Stress Test</label>
+                                <label class="radio-option"><input type="radio" name="signaling_report_type" value="echo"> Echo</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI Insights for Signaling Reports -->
+                <div class="ai-insights-container" id="signaling_insights_container" style="display: none;">
+                    <div class="insights-header">
+                        <h5><i class="fas fa-brain"></i> AI Medical Insights - Signaling Analysis</h5>
+                        <div class="insights-loader" id="signaling_insights_loader">
+                            <i class="fas fa-spinner fa-spin"></i> Analyzing report...
+                        </div>
+                    </div>
+                    <div class="insights-content" id="signaling_insights_content"></div>
+                    <input type="hidden" id="signaling_ai_insights" name="signaling_ai_insights">
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Navigation for Section 2 -->
+        <div class="section-navigation">
+            <button type="button" class="btn-navigation btn-prev" onclick="prevSection()">
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <button type="button" class="btn-navigation btn-next" onclick="nextSection()">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+        
+        </div>
+        <!-- End Section 2 -->
+
+        <!-- Section 3: Medicine & Follow-up -->
+        <div class="form-section-page" id="section-3" style="display: none;">
+
+        <!-- Current Medications Section -->
+        <div class="form-section medications-section">
+            <h3><i class="fas fa-pills"></i> Current Medications</h3>
+            <p class="section-description">Medicines currently being taken for various conditions</p>
+            
+            <!-- Medications Grid Container -->
+            <div class="medications-grid-container">
+                <!-- Row 1: Diabetes and Blood Pressure -->
+                <div class="medication-row">
+                    <!-- Diabetes Medications -->
+                    <div class="medication-card">
+                        <h4><i class="fas fa-tint"></i> Diabetes Medications</h4>
+                        <div class="form-group vital-input">
+                            <label for="diabetes_medication">Medicine Name</label>
+                            <input type="text" id="diabetes_medication" name="diabetes_medication" placeholder="e.g., Metformin, Insulin">
+                            <div class="vital-range">Current diabetes medication</div>
+                        </div>
+                        <div class="form-group vital-input">
+                            <label for="diabetes_dosage">Dosage & Frequency</label>
+                            <input type="text" id="diabetes_dosage" name="diabetes_dosage" placeholder="e.g., 500mg twice daily">
+                            <div class="vital-range">How much and how often</div>
+                        </div>
+                    </div>
+
+                    <!-- Blood Pressure Medications -->
+                    <div class="medication-card">
+                        <h4><i class="fas fa-heart"></i> Blood Pressure Medications</h4>
+                        <div class="form-group vital-input">
+                            <label for="bp_medication">Medicine Name</label>
+                            <input type="text" id="bp_medication" name="bp_medication" placeholder="e.g., Amlodipine, Telmisartan">
+                            <div class="vital-range">Current BP medication</div>
+                        </div>
+                        <div class="form-group vital-input">
+                            <label for="bp_dosage">Dosage & Frequency</label>
+                            <input type="text" id="bp_dosage" name="bp_dosage" placeholder="e.g., 5mg once daily">
+                            <div class="vital-range">How much and how often</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 2: Asthma and Heart Condition -->
+                <div class="medication-row">
+                    <!-- Asthma Medications -->
+                    <div class="medication-card">
+                        <h4><i class="fas fa-lungs"></i> Asthma Medications</h4>
+                        <div class="form-group vital-input">
+                            <label for="asthma_medication">Medicine Name</label>
+                            <input type="text" id="asthma_medication" name="asthma_medication" placeholder="e.g., Salbutamol, Budesonide">
+                            <div class="vital-range">Current asthma medication</div>
+                        </div>
+                        <div class="form-group vital-input">
+                            <label for="asthma_dosage">Dosage & Frequency</label>
+                            <input type="text" id="asthma_dosage" name="asthma_dosage" placeholder="e.g., 2 puffs as needed">
+                            <div class="vital-range">How much and how often</div>
+                        </div>
+                    </div>
+
+                    <!-- Heart Condition Medications -->
+                    <div class="medication-card">
+                        <h4><i class="fas fa-heartbeat"></i> Heart Condition Medications</h4>
+                        <div class="form-group vital-input">
+                            <label for="heart_medication">Medicine Name</label>
+                            <input type="text" id="heart_medication" name="heart_medication" placeholder="e.g., Atorvastatin, Aspirin">
+                            <div class="vital-range">Current heart medication</div>
+                        </div>
+                        <div class="form-group vital-input">
+                            <label for="heart_dosage">Dosage & Frequency</label>
+                            <input type="text" id="heart_dosage" name="heart_dosage" placeholder="e.g., 10mg once daily">
+                            <div class="vital-range">How much and how often</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 3: Other Medications (Full Width) -->
+                <div class="medication-row-single">
+                    <!-- Other Medications -->
+                    <div class="medication-card medication-card-wide">
+                        <h4><i class="fas fa-prescription-bottle-alt"></i> Other Medications</h4>
+                        <div class="medication-grid">
+                            <div class="form-group vital-input">
+                                <label for="other_medication">Other Medicine Names</label>
+                                <textarea id="other_medication" name="other_medication" rows="2" placeholder="List any other medications, supplements, or vitamins"></textarea>
+                                <div class="vital-range">Any other medications not listed above</div>
+                            </div>
+                            <div class="form-group vital-input">
+                                <label for="other_dosage">Dosage & Frequency</label>
+                                <textarea id="other_dosage" name="other_dosage" rows="2" placeholder="Dosage and frequency for other medications"></textarea>
+                                <div class="vital-range">How much and how often for other medications</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Navigation for Section 3 -->
+        <div class="section-navigation">
+            <button type="button" class="btn-navigation btn-prev" onclick="prevSection()">
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <button type="button" class="btn-navigation btn-next" onclick="nextSection()">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+        
+        </div>
+        <!-- End Section 3 -->
+
+        <!-- Section 4: AI Follow-up Questions -->
+        <div class="form-section-page" id="section-4" style="display: none;">
+
+        <!-- AI Follow-up Questions Section -->
+        <div class="form-section followup-section">
+            <h3><i class="fas fa-robot"></i> AI Follow-up Questions</h3>
+            <p class="section-description">AI-generated questions based on your vital signs and medical history</p>
+            
+            <div class="vitals-subsection">
+                <h4><i class="fas fa-question-circle"></i> Generated Questions</h4>
+                <div class="followup-questions" id="followup-questions">
+                    <div class="loading-questions">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Analyzing your data to generate personalized questions...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Navigation for Section 4 -->
+        <div class="section-navigation">
+            <button type="button" class="btn-navigation btn-prev" onclick="prevSection()">
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <button type="button" class="btn-navigation btn-next" onclick="submitForm()" style="background: linear-gradient(135deg, #27ae60, #2ecc71);">
+                Complete Step 4 <i class="fas fa-check"></i>
+            </button>
+        </div>
+        
+        </div>
+        <!-- End Section 4 -->
+
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentSection = 1;
+const totalSections = 4;
+
+// Load patient data when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    loadPatientDataForPrefill();
+    loadFollowupQuestions();
+    setupFileUploads();
+    checkEMRStatus();
+});
+
+// Load patient data for pre-filling forms (but not the name since it's already displayed)
+function loadPatientDataForPrefill() {
+    fetch('/get_patient_data')
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.registration) {
+            // Pre-fill contact info if available
+            if (data.registration.phone) {
+                document.getElementById('phone_primary').value = data.registration.phone;
+            }
+            if (data.registration.email) {
+                document.getElementById('email').value = data.registration.email;
+            }
+            if (data.registration.emergency_name) {
+                document.getElementById('emergency_name').value = data.registration.emergency_name;
+            }
+            if (data.registration.emergency_phone) {
+                document.getElementById('emergency_phone_primary').value = data.registration.emergency_phone;
+            }
+            
+            // Check EMR status from registration step (data is now cleaned of suffixes)
+            const emrExisting = data.registration.emr_existing;
+            
+            console.log('EMR existing value:', emrExisting);
+            console.log('Registration data keys:', Object.keys(data.registration));
+            
+            if (emrExisting === 'yes') {
+                // Show EMR link group and make it required
+                const emrGroup = document.getElementById('emr-link-group');
+                emrGroup.style.display = 'block';
+                emrGroup.classList.add('required');
+                
+                document.getElementById('emr_link').required = true;
+                document.getElementById('emr-status').textContent = 'EMR link is required (you selected Yes in registration)';
+                document.getElementById('emr-status').style.color = '#e74c3c';
+                document.getElementById('emr-status').style.fontWeight = 'bold';
+                
+                // Add visual indicator to the label
+                const emrLabel = document.querySelector('label[for="emr_link"]');
+                if (emrLabel && !emrLabel.innerHTML.includes('*')) {
+                    emrLabel.innerHTML = 'EMR Link <span style="color: #e74c3c;">*</span>';
+                }
+                
+                console.log('EMR field is required - displaying EMR link input');
+            } else {
+                // Hide EMR link group when not needed
+                const emrGroup = document.getElementById('emr-link-group');
+                emrGroup.style.display = 'none';
+                emrGroup.classList.remove('required');
+                document.getElementById('emr_link').required = false;
+                console.log('EMR field not required - hiding EMR link input');
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error loading patient data:', error);
+    });
+}
+
+// Check EMR status
+function checkEMRStatus() {
+    // This would integrate with EMR systems to validate links
+    // For now, we'll just show a placeholder
+}
+
+// Load AI-generated follow-up questions
+function loadFollowupQuestions() {
+    const container = document.getElementById('followup-questions');
+    
+    fetch('/generate_followup_questions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (data.questions && data.questions.length > 0) {
+                // Display questions for abnormal findings
+                displayFollowupQuestions(data.questions);
+                
+                // Show findings summary if available
+                if (data.findings_count > 0) {
+                    const summaryHtml = `
+                        <div class="findings-summary">
+                            <div class="summary-header">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Found ${data.findings_count} parameter(s) requiring medical attention</span>
+                                ${data.critical_count > 0 ? `<span class="critical-badge">${data.critical_count} Critical</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                    container.insertAdjacentHTML('afterbegin', summaryHtml);
+                }
+            } else if (data.summary) {
+                // Display summary for normal vitals
+                container.innerHTML = `
+                    <div class="vitals-summary">
+                        <div class="summary-header">
+                            <i class="fas fa-check-circle" style="color: #27ae60;"></i>
+                            <span>Vitals Assessment Summary</span>
+                        </div>
+                        <div class="summary-content">
+                            ${data.summary.replace(/\n/g, '<br>')}
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = '<p class="no-questions">All vitals appear normal. No specific follow-up questions at this time.</p>';
+            }
+        } else {
+            container.innerHTML = '<p class="error-questions">Error loading questions. Please continue with the form.</p>';
+        }
+    })
+    .catch(error => {
+        console.error('Error loading follow-up questions:', error);
+        container.innerHTML = '<p class="error-questions">Error loading questions. Please continue with the form.</p>';
+    });
+}
+
+// Display follow-up questions
+function displayFollowupQuestions(questions) {
+    const container = document.getElementById('followup-questions');
+    let html = '';
+    
+    // Add instructions
+    html += `
+        <div class="questions-instructions">
+            <p><i class="fas fa-info-circle"></i> The following questions are generated based on your abnormal vital signs. Please answer them to help provide better medical insights.</p>
+        </div>
+    `;
+    
+    questions.forEach((question, index) => {
+        const priorityClass = question.priority === 'critical' ? 'priority-critical' :
+                            question.priority === 'high' ? 'priority-high' : 
+                            question.priority === 'medium' ? 'priority-medium' : 'priority-low';
+        
+        const priorityText = question.priority === 'critical' ? 'CRITICAL' :
+                           question.priority === 'high' ? 'Important' : 
+                           question.priority === 'medium' ? 'Follow-up' : 'Optional';
+        
+        html += `
+            <div class="question-card ${priorityClass}">
+                <div class="question-header">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span class="abnormal-finding">${question.abnormal_finding || 'Medical Finding'}</span>
+                    ${question.priority === 'critical' || question.priority === 'high' ? 
+                      `<span class="priority-badge priority-${question.priority}">${priorityText}</span>` : ''}
+                </div>
+                <div class="question-text">${question.question}</div>
+                <div class="question-input">
+                    <textarea name="followup_answer_${index}" rows="3" 
+                              placeholder="Please provide detailed information about this condition..." 
+                              ${question.priority === 'critical' || question.priority === 'high' ? 'required' : ''}></textarea>
+                </div>
+            </div>
+        `;
+    });
+    
+    // Store questions for form submission
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.name = 'generated_questions';
+    hiddenInput.value = JSON.stringify(questions);
+    container.appendChild(hiddenInput);
+    
+    container.innerHTML += html;
+}
+
+// Setup file upload handlers
+function setupFileUploads() {
+    // Lab report upload
+    document.getElementById('lab_report_file').addEventListener('change', function(e) {
+        handleFileUpload(e, 'lab', 'Laboratory Report');
+    });
+    
+    // Medical image upload
+    document.getElementById('medical_image_file').addEventListener('change', function(e) {
+        handleFileUpload(e, 'image', 'Medical Image');
+    });
+    
+    // Signaling report upload
+    document.getElementById('signaling_report_file').addEventListener('change', function(e) {
+        handleFileUpload(e, 'signal', 'Signaling Report');
+    });
+}
+
+// Handle file uploads and AI extraction
+function handleFileUpload(event, type, displayName) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const statusElement = document.getElementById(`${type}-upload-status`);
+    const extractedInfoElement = document.getElementById(`${type}-extracted-info`);
+    
+    statusElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading and analyzing...';
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', type);
+    
+    fetch('/analyze_medical_document', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            statusElement.innerHTML = '<i class="fas fa-check text-green"></i> Uploaded and analyzed successfully';
+            
+            if (data.extracted_info) {
+                document.getElementById(`${type}-extracted-content`).innerHTML = data.extracted_info;
+                extractedInfoElement.style.display = 'block';
+            }
+        } else {
+            statusElement.innerHTML = '<i class="fas fa-exclamation-triangle text-red"></i> Upload failed: ' + (data.error || 'Unknown error');
+        }
+    })
+    .catch(error => {
+        console.error('Upload error:', error);
+        statusElement.innerHTML = '<i class="fas fa-times text-red"></i> Upload error: ' + error.message;
+    });
+}
+
+// Navigation functions
+function nextSection() {
+    if (currentSection < totalSections) {
+        document.getElementById(`section-${currentSection}`).style.display = 'none';
+        currentSection++;
+        document.getElementById(`section-${currentSection}`).style.display = 'block';
+        updatePagination();
+    }
+}
+
+function prevSection() {
+    if (currentSection > 1) {
+        document.getElementById(`section-${currentSection}`).style.display = 'none';
+        currentSection--;
+        document.getElementById(`section-${currentSection}`).style.display = 'block';
+        updatePagination();
+    }
+}
+
+function updatePagination() {
+    const dots = document.querySelectorAll('.pagination-dots .dot');
+    dots.forEach((dot, index) => {
+        const sectionNumber = index + 1;
+        if (sectionNumber === currentSection) {
+            dot.classList.add('active');
+        } else if (sectionNumber < currentSection) {
+            dot.classList.remove('active');
+            dot.classList.add('completed');
+        } else {
+            dot.classList.remove('active', 'completed');
+        }
+    });
+    
+    const progressFill = document.querySelector('.progress-fill');
+    if (progressFill) {
+        const percentage = 57.14 + ((currentSection - 1) / totalSections) * 10; // Step 4 base + internal progress
+        progressFill.style.width = `${percentage}%`;
+    }
+}
+
+function submitForm() {
+    console.log('submitForm() called');
+    submitFormData();
+}
+
+function submitFormData() {
+    console.log('submitFormData() called');
+    const form = document.getElementById('medicalForm');
+    
+    if (!form) {
+        console.error('Form not found!');
+        alert('Error: Form not found');
+        return;
+    }
+    
+    console.log('Form found, proceeding with submission...');
+    
+    // Show loading on the final button
+    const submitBtn = document.querySelector('.section-navigation .btn-next');
+    if (!submitBtn) {
+        console.error('Submit button not found!');
+        alert('Error: Submit button not found');
+        return;
+    }
+    
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    submitBtn.disabled = true;
+    
+    const formData = new FormData(form);
+    
+    console.log('Sending data to /save_step4...');
+    
+    fetch('/save_step4', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        console.log('Response received:', response.status, response.statusText);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response data:', data);
+        if (data.success) {
+            console.log('Success! Redirecting to step5...');
+            submitBtn.innerHTML = '<i class="fas fa-check"></i> Saved Successfully!';
+            submitBtn.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
+            setTimeout(() => {
+                console.log('Navigating to /step5');
+                window.location.href = '/step5';
+            }, 1500);
+        } else {
+            console.error('Server error:', data.error);
+            alert('Error saving medical records: ' + (data.error || 'Unknown error'));
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        alert('Error: ' + error.message);
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+}
+</script>
+
+<style>
+/* Pagination Controls Styles */
+.pagination-controls {
+    margin-bottom: 6px;
+    padding: 4px;
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.pagination-dots {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.pagination-dots::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 30px;
+    right: 30px;
+    height: 1px;
+    background: #e9ecef;
+    z-index: 1;
+}
+
+.dot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+    padding: 3px;
+    border-radius: 4px;
+}
+
+.dot:hover {
+    background: rgba(52, 152, 219, 0.1);
+}
+
+.dot-number {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 10px;
+    margin-bottom: 2px;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+.dot-label {
+    font-size: 9px;
+    color: #6c757d;
+    font-weight: 500;
+    max-width: 80px;
+    line-height: 1.1;
+    transition: color 0.3s ease;
+}
+
+.dot.active .dot-number {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border-color: #3498db;
+    box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
+}
+
+.dot.active .dot-label {
+    color: #3498db;
+    font-weight: 600;
+}
+
+.dot.completed .dot-number {
+    background: linear-gradient(135deg, #27ae60, #229954);
+    color: white;
+    border-color: #27ae60;
+    box-shadow: 0 2px 4px rgba(39, 174, 96, 0.3);
+}
+
+.dot.completed .dot-label {
+    color: #27ae60;
+    font-weight: 600;
+}
+
+/* Form Section Page Styles - Same as Step 3 */
+.form-section-page {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Compact styling for all form pages */
+#section-2.form-section-page, #section-3.form-section-page {
+    padding: 6px 0;
+    line-height: 1.3;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Form Section Styles - Same as Step 3 */
+.form-section {
+    background: white;
+    border-radius: 6px;
+    padding: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    border: 1px solid #e8f4fd;
+    margin-bottom: 8px;
+}
+
+.form-section h3 {
+    color: #2c3e50;
+    margin-bottom: 4px;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-description {
+    color: #7f8c8d;
+    margin-bottom: 6px;
+    font-style: italic;
+    font-size: 0.8em;
+    line-height: 1.3;
+}
+
+/* Vitals Grid Layout - Same as Step 3 */
+.vitals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.vitals-subsection {
+    margin-bottom: 8px;
+}
+
+.vitals-subsection h4 {
+    color: #34495e;
+    margin-bottom: 6px;
+    font-size: 1.0em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 6px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 2px;
+    font-size: 0.85em;
+}
+
+.vital-input input, .vital-input textarea, .vital-input select {
+    padding: 6px;
+    border: 1px solid #e8f4fd;
+    border-radius: 4px;
+    font-size: 0.85em;
+    background: #fafafa;
+    transition: all 0.3s ease;
+}
+
+.vital-input input:focus, .vital-input textarea:focus, .vital-input select:focus {
+    outline: none;
+    border-color: #3498db;
+    background: white;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+.vital-range {
+    font-size: 0.7em;
+    color: #7f8c8d;
+    margin-top: 1px;
+    font-style: italic;
+}
+
+/* Ultra Compact styling for ALL sections to fit screen */
+#section-1 .form-section, #section-2 .form-section, #section-3 .form-section, #section-4 .form-section {
+    padding: 1px;
+    margin-bottom: 0px;
+}
+
+#section-1 .vitals-subsection, #section-2 .vitals-subsection, #section-3 .vitals-subsection, #section-4 .vitals-subsection {
+    margin-bottom: 0px;
+}
+
+#section-1 .section-description, #section-2 .section-description, #section-3 .section-description, #section-4 .section-description {
+    margin-bottom: 0px;
+    font-size: 0.55em;
+    line-height: 0.9;
+}
+
+#section-1 .vitals-grid, #section-2 .vitals-grid, #section-3 .vitals-grid, #section-4 .vitals-grid {
+    gap: 1px;
+    margin-bottom: 0px;
+}
+
+#section-1 .form-group, #section-2 .form-group, #section-3 .form-group, #section-4 .form-group {
+    margin-bottom: 0px;
+}
+
+#section-1 .form-section h3, #section-2 .form-section h3, #section-3 .form-section h3, #section-4 .form-section h3 {
+    margin-bottom: 0px;
+    font-size: 0.8em;
+}
+
+#section-1 .vitals-subsection h4, #section-2 .vitals-subsection h4, #section-3 .vitals-subsection h4, #section-4 .vitals-subsection h4 {
+    margin-bottom: 0px;
+    font-size: 0.7em;
+    padding-bottom: 0px;
+}
+
+#section-1 .vital-input label, #section-2 .vital-input label, #section-3 .vital-input label, #section-4 .vital-input label {
+    margin-bottom: 0px;
+    font-size: 0.65em;
+}
+
+#section-1 .vital-input input, #section-3 .vital-input input,
+#section-1 .vital-input textarea, #section-2 .vital-input textarea,
+#section-1 .vital-input select, #section-2 .vital-input select,
+#section-2 .vital-input input, #section-3 .vital-input textarea,
+#section-2 .vital-input select, #section-3 .vital-input select,
+#section-4 .vital-input input, #section-4 .vital-input textarea,
+#section-4 .vital-input select {
+    padding: 1px;
+    font-size: 0.65em;
+    min-height: 20px;
+}
+
+#section-1 .vital-range, #section-2 .vital-range, #section-3 .vital-range, #section-4 .vital-range {
+    font-size: 0.5em;
+}
+
+/* Section Navigation - Same as Step 3 */
+.section-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    padding: 8px;
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+#section-1 .section-navigation, #section-2 .section-navigation, #section-3 .section-navigation, #section-4 .section-navigation {
+    margin-top: 1px;
+    padding: 1px;
+}
+
+/* Page 2 specific ultra compact spacing */
+#section-2 .form-section {
+    padding: 0px;
+    margin-bottom: 0px;
+}
+
+#section-2 .vitals-subsection {
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+}
+
+/* Ultra compact file upload areas */
+.file-upload-area {
+    border: 2px dashed #ddd;
+    border-radius: 6px;
+    padding: 8px;
+    text-align: center;
+    background: #fafbfc;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-bottom: 6px;
+}
+
+#section-2 .file-upload-area {
+    padding: 6px;
+    margin-bottom: 3px;
+}
+
+.file-upload-area:hover {
+    border-color: #007bff;
+    background: #f0f7ff;
+}
+
+.file-upload-area i {
+    font-size: 1.5em;
+    color: #007bff;
+    margin-bottom: 4px;
+}
+
+#section-2 .file-upload-area i {
+    font-size: 1.2em;
+    margin-bottom: 2px;
+}
+
+.file-upload-area p {
+    margin: 0;
+    color: #666;
+    font-size: 0.8em;
+}
+
+#section-2 .file-upload-area p {
+    font-size: 0.7em;
+}
+
+.file-upload-area input[type="file"] {
+    display: none;
+}
+
+.upload-status {
+    margin-top: 4px;
+    padding: 4px;
+    border-radius: 4px;
+    font-size: 0.7em;
+    text-align: center;
+}
+
+#section-2 .upload-status {
+    margin-top: 2px;
+    padding: 2px;
+    font-size: 0.65em;
+}
+
+/* Ultra compact navigation buttons */
+.btn-navigation {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.8em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+#section-1 .btn-navigation, #section-2 .btn-navigation, 
+#section-3 .btn-navigation, #section-4 .btn-navigation {
+    padding: 4px 8px;
+    font-size: 0.7em;
+    gap: 2px;
+}
+
+/* Ultra compact loading questions */
+.loading-questions {
+    text-align: center;
+    padding: 12px;
+    color: #666;
+}
+
+#section-4 .loading-questions {
+    padding: 6px;
+}
+
+.loading-questions i {
+    font-size: 1.2em;
+    margin-bottom: 4px;
+}
+
+#section-4 .loading-questions i {
+    font-size: 1em;
+    margin-bottom: 2px;
+}
+
+.loading-questions p {
+    margin: 0;
+    font-size: 0.8em;
+}
+
+#section-4 .loading-questions p {
+    font-size: 0.7em;
+}
+
+/* AI Insights Styling - Ultra Ultra Compact */
+.ai-insights-container {
+    margin-top: 1px;
+    border: 1px solid #e8f4fd;
+    border-radius: 3px;
+    background: linear-gradient(135deg, #f8fbff, #f0f8ff);
+    overflow: hidden;
+}
+
+#section-2 .ai-insights-container {
+    margin-top: 0px;
+}
+
+.insights-header {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    padding: 2px 3px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#section-2 .insights-header {
+    padding: 1px 2px;
+}
+
+.insights-header h5 {
+    margin: 0;
+    font-size: 0.6em;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+#section-2 .insights-header h5 {
+    font-size: 0.55em;
+    gap: 1px;
+}
+
+.insights-loader {
+    font-size: 0.55em;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+#section-2 .insights-loader {
+    font-size: 0.5em;
+}
+
+.insights-content {
+    padding: 2px;
+    font-size: 0.55em;
+    line-height: 1.1;
+    color: #2c3e50;
+}
+
+#section-2 .insights-content {
+    padding: 1px;
+    font-size: 0.5em;
+    line-height: 1.0;
+}
+
+.insight-section {
+    margin-bottom: 1px;
+    padding-bottom: 1px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+#section-2 .insight-section {
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+}
+
+.insight-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.insight-label {
+    font-weight: 600;
+    color: #2980b9;
+    margin-bottom: 0px;
+}
+
+#section-2 .insight-label {
+    margin-bottom: 0px;
+}
+
+.insight-value {
+    color: #34495e;
+    margin-bottom: 1px;
+}
+
+#section-2 .insight-value {
+    margin-bottom: 0px;
+}
+
+.confidence-badge {
+    display: inline-block;
+    padding: 0px 2px;
+    border-radius: 6px;
+    font-size: 0.6em;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+#section-2 .confidence-badge {
+    padding: 0px 1px;
+    font-size: 0.5em;
+}
+
+.confidence-high {
+    background-color: #d5f4e6;
+    color: #27ae60;
+}
+
+.confidence-medium {
+    background-color: #fef9e7;
+    color: #f39c12;
+}
+
+.confidence-low {
+    background-color: #fadbd8;
+    color: #e74c3c;
+}
+
+/* File input styling - Ultra Compact */
+.file-input {
+    position: relative;
+}
+
+.file-input input[type="file"] {
+    width: 100%;
+    padding: 4px;
+    border: 2px dashed #bdc3c7;
+    border-radius: 4px;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#section-2 .file-input input[type="file"] {
+    padding: 3px;
+}
+
+.file-input input[type="file"]:hover {
+    border-color: #3498db;
+    background: #e8f4fd;
+}
+
+.file-hint {
+    font-size: 0.65em;
+    color: #7f8c8d;
+    margin-top: 1px;
+    font-style: italic;
+}
+
+#section-2 .file-hint {
+    font-size: 0.6em;
+    margin-top: 0px;
+}
+
+/* Ultra Compact Radio Button Styling */
+.radio-button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-top: 1px;
+}
+
+#section-2 .radio-button-group {
+    gap: 0px;
+}
+
+.radio-row {
+    display: flex;
+    gap: 3px;
+    flex-wrap: wrap;
+}
+
+#section-2 .radio-row {
+    gap: 2px;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 1px 3px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.65em;
+    white-space: nowrap;
+    min-width: fit-content;
+    line-height: 1.0;
+}
+
+#section-2 .radio-option {
+    padding: 1px 2px;
+    gap: 1px;
+    font-size: 0.6em;
+}
+
+.radio-option:hover {
+    background: #e8f4fd;
+    border-color: #3498db;
+}
+
+.radio-option input[type="radio"] {
+    margin: 0;
+    width: 10px;
+    height: 10px;
+}
+
+#section-2 .radio-option input[type="radio"] {
+    width: 8px;
+    height: 8px;
+}
+
+.radio-option input[type="radio"]:checked + label,
+.radio-option:has(input[type="radio"]:checked) {
+    background: #3498db;
+    color: white;
+    border-color: #2980b9;
+}
+
+/* Ensure radio buttons fit in compact space */
+@media (max-width: 768px) {
+    .radio-row {
+        gap: 2px;
+    }
+    
+    .radio-option {
+        font-size: 0.6em;
+        padding: 1px 2px;
+    }
+}
+
+.btn-navigation {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
+}
+
+.btn-navigation:hover {
+    background: linear-gradient(135deg, #2980b9, #1f639a);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.4);
+}
+
+.btn-navigation:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-prev {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+}
+
+.btn-prev:hover {
+    background: linear-gradient(135deg, #7f8c8d, #6c7b7d);
+}
+
+/* Step 4 specific styles */
+.patient-info-section {
+    background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+    border-left: 4px solid #2196f3;
+}
+
+.patient-display {
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.patient-name-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.patient-name-display label {
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.patient-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2196f3;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 2px solid #e9ecef;
+}
+
+.patient-details {
+    display: flex;
+    gap: 15px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.patient-age, .patient-gender {
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    padding: 4px 8px;
+    background: #e3f2fd;
+    border-radius: 4px;
+    border: 1px solid #bbdefb;
+}
+
+/* EMR Link Field Styling */
+#emr-link-group {
+    transition: all 0.3s ease;
+}
+
+#emr-link-group.required {
+    background: #fff8f0;
+    border: 2px solid #ff9800;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px 0;
+}
+
+#emr-link-group.required label {
+    color: #e65100;
+    font-weight: 600;
+}
+
+#emr-link-group.required input {
+    border-color: #ff9800;
+}
+
+#emr-link-group.required #emr-status {
+    color: #e65100 !important;
+    font-weight: 600 !important;
+}
+
+.contact-section {
+    background: linear-gradient(135deg, #e8f5e8, #f1f8e9);
+    border-left: 4px solid #4caf50;
+}
+
+.emergency-section {
+    background: linear-gradient(135deg, #ffebee, #fce4ec);
+    border-left: 4px solid #f44336;
+}
+
+.lab-reports-section {
+    background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+    border-left: 4px solid #9c27b0;
+}
+
+.medical-images-section {
+    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+    border-left: 4px solid #ff9800;
+}
+
+.signaling-section {
+    background: linear-gradient(135deg, #ffebee, #ffcdd2);
+    border-left: 4px solid #f44336;
+}
+
+.medications-section {
+    background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+    border-left: 4px solid #4caf50;
+}
+
+.followup-section {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    border-left: 4px solid #2196f3;
+}
+
+.upload-area {
+    margin-bottom: 20px;
+}
+
+.file-upload-section {
+    margin-top: 8px;
+}
+
+#section-2 .file-upload-section {
+    margin-top: 4px;
+}
+
+.upload-card {
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    background: #fafafa;
+    transition: all 0.3s ease;
+}
+
+#section-2 .upload-card {
+    padding: 12px;
+}
+
+.upload-card:hover {
+    border-color: #007bff;
+    background: #f8f9ff;
+}
+
+.upload-icon {
+    font-size: 36px;
+    color: #007bff;
+    margin-bottom: 8px;
+}
+
+#section-2 .upload-icon {
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+
+.upload-card h4 {
+    margin: 0 0 4px 0;
+    color: #333;
+    font-size: 1.0em;
+}
+
+#section-2 .upload-card h4 {
+    font-size: 0.9em;
+}
+
+.upload-card p {
+    margin: 0 0 12px 0;
+    color: #666;
+    font-size: 0.8em;
+}
+
+#section-2 .upload-card p {
+    font-size: 0.7em;
+    margin-bottom: 8px;
+}
+
+.btn-upload {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-upload:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    transform: translateY(-1px);
+}
+
+.upload-status {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #666;
+}
+
+.extracted-info-display {
+    margin-top: 12px;
+    padding: 12px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+#section-2 .extracted-info-display {
+    margin-top: 3px;
+    padding: 4px;
+}
+
+.extracted-info-display h5 {
+    margin: 0 0 4px 0;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8em;
+}
+
+#section-2 .extracted-info-display h5 {
+    font-size: 0.7em;
+    margin-bottom: 2px;
+}
+
+.extracted-content {
+    background: #f8f9fa;
+    padding: 4px;
+    border-radius: 4px;
+    border-left: 3px solid #007bff;
+    white-space: pre-wrap;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 0.7em;
+}
+
+#section-2 .extracted-content {
+    padding: 3px;
+    font-size: 0.65em;
+}
+
+.question-card {
+    background: white;
+    border-radius: 6px;
+    padding: 6px;
+    margin-bottom: 4px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+#section-4 .question-card {
+    padding: 4px;
+    margin-bottom: 2px;
+}
+
+.question-text {
+    font-size: 0.8em;
+    color: #333;
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+
+#section-4 .question-text {
+    font-size: 0.7em;
+    margin-bottom: 2px;
+}
+
+.question-input textarea {
+    width: 100%;
+    padding: 4px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.7em;
+    resize: vertical;
+    min-height: 40px;
+}
+
+#section-4 .question-input textarea {
+    padding: 3px;
+    font-size: 0.65em;
+    min-height: 35px;
+}
+
+.medication-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+#section-3 .medication-grid {
+    gap: 4px;
+    margin-bottom: 2px;
+}
+
+.upload-area {
+    margin-bottom: 6px;
+}
+
+#section-2 .upload-area {
+    margin-bottom: 3px;
+}
+
+/* Medications Grid Layout for 2x2 arrangement - Ultra Compact */
+.medications-grid-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+
+.medication-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+}
+
+.medication-row-single {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+}
+
+.medication-card {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 6px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.medication-card-wide {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 6px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    grid-column: 1 / -1;
+}
+
+#section-3 .medication-card,
+#section-3 .medication-card-wide {
+    padding: 4px;
+}
+
+.medication-card h5 {
+    margin: 0 0 4px 0;
+    font-size: 0.8em;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+#section-3 .medication-card h5 {
+    font-size: 0.7em;
+    margin-bottom: 2px;
+    gap: 2px;
+}
+
+.medication-inputs {
+    display: grid;
+    gap: 3px;
+}
+
+#section-3 .medication-inputs {
+    gap: 2px;
+}
+
+.med-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.med-input-group label {
+    font-size: 0.7em;
+    color: #555;
+    margin-bottom: 0px;
+}
+
+#section-3 .med-input-group label {
+    font-size: 0.65em;
+}
+
+.med-input-group input,
+.med-input-group select,
+.med-input-group textarea {
+    padding: 3px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.7em;
+    min-height: 26px;
+}
+
+#section-3 .med-input-group input,
+#section-3 .med-input-group select,
+#section-3 .med-input-group textarea {
+    padding: 2px;
+    font-size: 0.65em;
+    min-height: 24px;
+}
+
+.med-input-group textarea {
+    resize: vertical;
+    min-height: 40px;
+}
+
+#section-3 .med-input-group textarea {
+    min-height: 35px;
+}
+    flex-direction: column;
+    gap: 8px;
+}
+
+.medication-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.medication-row-single {
+    display: flex;
+    width: 100%;
+}
+
+.medication-card {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.medication-card-wide {
+    width: 100%;
+}
+
+.medication-card h4 {
+    color: #34495e;
+    margin-bottom: 6px;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+#section-3 .medications-grid-container {
+    gap: 4px;
+}
+
+#section-3 .medication-row {
+    gap: 4px;
+}
+
+#section-3 .medication-card {
+    padding: 6px;
+}
+
+#section-3 .medication-card h4 {
+    font-size: 0.8em;
+    margin-bottom: 4px;
+}
+
+.loading-questions {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.loading-questions i {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.question-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.question-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.question-category {
+    background: #007bff;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.question-text {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.question-input textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+}
+
+.no-questions, .error-questions {
+    text-align: center;
+    padding: 30px;
+    color: #666;
+    font-style: italic;
+}
+
+.error-questions {
+    color: #dc3545;
+}
+
+.text-green { color: #28a745; }
+.text-red { color: #dc3545; }
+/* Follow-up Questions Styling */
+.questions-instructions {
+    background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+    border-left: 4px solid #2196f3;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+.questions-instructions p {
+    margin: 0;
+    color: #1565c0;
+    font-weight: 500;
+}
+
+.findings-summary {
+    background: linear-gradient(135deg, #fff3e0, #fce4ec);
+    border-left: 4px solid #ff9800;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+.summary-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    color: #e65100;
+}
+
+.critical-badge {
+    background: #f44336;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.vitals-summary {
+    background: linear-gradient(135deg, #e8f5e8, #f1f8e9);
+    border-left: 4px solid #4caf50;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.vitals-summary .summary-header {
+    color: #2e7d32;
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.vitals-summary .summary-content {
+    color: #388e3c;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.question-card {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.question-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+.question-card.priority-critical {
+    border-left: 4px solid #d32f2f;
+    background: linear-gradient(135deg, #fff, #ffebee);
+    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.15);
+    animation: pulse-critical 2s infinite;
+}
+
+@keyframes pulse-critical {
+    0% { box-shadow: 0 4px 12px rgba(211, 47, 47, 0.15); }
+    50% { box-shadow: 0 6px 16px rgba(211, 47, 47, 0.25); }
+    100% { box-shadow: 0 4px 12px rgba(211, 47, 47, 0.15); }
+}
+
+.question-card.priority-high {
+    border-left: 4px solid #f44336;
+    background: linear-gradient(135deg, #fff, #ffebee);
+}
+
+.question-card.priority-medium {
+    border-left: 4px solid #ff9800;
+    background: linear-gradient(135deg, #fff, #fff3e0);
+}
+
+.question-card.priority-low {
+    border-left: 4px solid #4caf50;
+    background: linear-gradient(135deg, #fff, #e8f5e8);
+}
+
+.abnormal-finding {
+    background: #ffebee;
+    color: #d32f2f;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid #ffcdd2;
+}
+
+.priority-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.priority-badge.priority-critical {
+    background: #d32f2f;
+    color: white;
+    animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.7; }
+}
+
+.priority-badge.priority-high {
+    background: #f44336;
+    color: white;
+}
+
+.question-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.question-header i {
+    color: #1976d2;
+    font-size: 18px;
+}
+
+.question-category {
+    background: #e3f2fd;
+    color: #1565c0;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.priority-badge {
+    background: #f44336;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: bold;
+    margin-left: auto;
+}
+
+.question-text {
+    font-size: 16px;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+.question-input textarea {
+    width: 100%;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    resize: vertical;
+    transition: border-color 0.3s ease;
+}
+
+.question-input textarea:focus {
+    outline: none;
+    border-color: #2196f3;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+.question-input textarea[required] {
+    border-color: #ff9800;
+}
+
+.no-questions, .error-questions {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+    font-style: italic;
+}
+
+.error-questions {
+    color: #f44336;
+}
+
+.loading-questions {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+}
+
+.loading-questions i {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #2196f3;
+}
+
+.text-blue { color: #007bff; }
+.text-purple { color: #6f42c1; }
+.text-orange { color: #fd7e14; }
+
+@media (max-width: 768px) {
+    .medication-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .medication-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+    
+    .medication-row-single {
+        width: 100%;
+    }
+    
+    .medication-card-wide {
+        width: 100%;
+    }
+    
+    .vitals-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .patient-name-display {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .upload-card {
+        padding: 15px;
+    }
+    
+    .upload-icon {
+        font-size: 28px;
+    }
+    
+    .form-section {
+        padding: 8px;
+    }
+    
+    .section-navigation {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .btn-navigation {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    #section-2 .upload-card, #section-3 .upload-card {
+        padding: 10px;
+    }
+    
+    #section-2 .upload-icon, #section-3 .upload-icon {
+        font-size: 20px;
+    }
+    
+    .medication-card {
+        margin-bottom: 6px;
+    }
+}
+</style>
+{% endblock %}
