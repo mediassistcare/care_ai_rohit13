@@ -1,0 +1,539 @@
+{
+  "session_info": {
+    "session_id": "c08293bf-2cd1-4b1d-ada3-80a5db14b54c",
+    "created_at": "2025-08-21T21:12:15.265044",
+    "last_updated": "2025-08-21T21:14:15.468930",
+    "highest_step_completed": 6
+  },
+  "step1": {
+    "step_name": "Case Category Selection",
+    "form_data": {
+      "case_category": "illness"
+    },
+    "ai_generated_data": {},
+    "files_uploaded": {},
+    "timestamp": "2025-08-21T21:12:15.265194",
+    "data_source": "user_input",
+    "step_completed": true
+  },
+  "step2": {
+    "step_name": "Patient Registration",
+    "form_data": {
+      "full_name": "SAMARTH SHARMA",
+      "date_of_birth": "1986-06-20",
+      "gender": "male",
+      "income_source": "other",
+      "calculated_age": "39",
+      "lab_reports": "yes",
+      "medical_images": "yes",
+      "signaling_reports": "yes"
+    },
+    "ai_generated_data": {
+      "aadhaar_extraction": {
+        "aadhaar_number": "1234 5678 9012",
+        "address": null,
+        "date_of_birth": "20/06/1986",
+        "extracted_from": "front side",
+        "extraction_confidence": "high",
+        "full_name": "SAMARTH SHARMA",
+        "gender": "Male"
+      }
+    },
+    "files_uploaded": {
+      "aadhar_combined": {
+        "filename": "sample_aadhaar.png",
+        "upload_timestamp": "2025-08-21T21:12:31.050063",
+        "field_name": "aadhar_combined",
+        "content_type": "image/png"
+      }
+    },
+    "timestamp": "2025-08-21T21:12:31.050966",
+    "data_source": "user_input_and_extraction",
+    "step_completed": true
+  },
+  "step3": {
+    "step_name": "Vital Signs & Medical Photos",
+    "form_data": {
+      "temperature_unit": "celsius",
+      "oxygen_saturation": "50",
+      "glucose_timing": "random",
+      "lung_congestion": "none",
+      "water_in_lungs": "none",
+      "ecg_available": "no"
+    },
+    "ai_generated_data": {},
+    "files_uploaded": {},
+    "timestamp": "2025-08-21T21:12:42.448276",
+    "data_source": "user_input_and_analysis",
+    "step_completed": true
+  },
+  "step4": {
+    "step_name": "Medical Records & Contact Information",
+    "form_data": {},
+    "ai_generated_data": {
+      "generated_questions": "[{\"abnormal_finding\":\"Oxygen Saturation: 50.0% (Normal: 95-100%)\",\"medical_concern\":\"severe hypoxemia\",\"priority\":\"critical\",\"question\":\"Your oxygen saturation is critically low at 50.0%, well below the normal range of 95-100%. Are you experiencing any symptoms such as severe shortness of breath, confusion, or bluish discoloration of your lips or fingertips?\"},{\"abnormal_finding\":\"Oxygen Saturation: 50.0% (Normal: 95-100%)\",\"medical_concern\":\"acute hypoxemia onset\",\"priority\":\"critical\",\"question\":\"With your oxygen saturation at 50.0%, have you noticed when these symptoms began? Was there a specific event or activity that seemed to trigger this drop in oxygen levels?\"},{\"abnormal_finding\":\"Oxygen Saturation: 50.0% (Normal: 95-100%)\",\"medical_concern\":\"underlying respiratory condition\",\"priority\":\"critical\",\"question\":\"Given your oxygen saturation is at 50.0%, do you have any known lung conditions, such as COPD or asthma, or have you been exposed to any environmental factors that could affect your breathing?\"},{\"abnormal_finding\":\"Oxygen Saturation: 50.0% (Normal: 95-100%)\",\"medical_concern\":\"systemic effects of hypoxemia\",\"priority\":\"critical\",\"question\":\"With an oxygen saturation of 50.0%, are you experiencing any additional symptoms like dizziness, fatigue, or a rapid heartbeat that might indicate the severity of your condition?\"}]"
+    },
+    "files_uploaded": {},
+    "timestamp": "2025-08-21T21:12:51.600171",
+    "data_source": "user_input_and_analysis",
+    "step_completed": true
+  },
+  "step5": {
+    "step_name": "Complaints & Symptoms",
+    "form_data": {
+      "complaint_text": "fever, cough"
+    },
+    "ai_generated_data": {
+      "symptom_insights": {
+        "key_insights": [
+          "The combination of fever and cough suggests a possible respiratory infection.",
+          "Critically low oxygen saturation is a major concern and requires urgent intervention.",
+          "No lung congestion or water in the lungs suggests the absence of overt pulmonary edema, but hypoxemia needs immediate evaluation."
+        ],
+        "medical_labels": [
+          {
+            "category": "symptom",
+            "confidence": 90,
+            "description": "An elevated body temperature, often indicative of an infection or inflammation.",
+            "label": "Fever",
+            "severity": "moderate"
+          },
+          {
+            "category": "symptom",
+            "confidence": 85,
+            "description": "A reflex action to clear the airways of mucus or irritants.",
+            "label": "Cough",
+            "severity": "mild"
+          },
+          {
+            "category": "finding",
+            "confidence": 95,
+            "description": "Abnormally low level of oxygen in the blood, indicated by oxygen saturation of 50%.",
+            "label": "Hypoxemia",
+            "severity": "severe"
+          }
+        ],
+        "symptom_summary": {
+          "affected_systems": [
+            "Respiratory system",
+            "Circulatory system"
+          ],
+          "duration_significance": "Immediate assessment is required due to critical oxygen levels.",
+          "next_steps": "Urgent referral to emergency services for oxygen therapy and further evaluation. Consider questions about duration of symptoms and any additional respiratory distress.",
+          "primary_concern": "Hypoxemia"
+        },
+        "urgency_assessment": {
+          "immediate_concerns": [
+            "Severe hypoxemia",
+            "Potential respiratory failure"
+          ],
+          "level": "critical",
+          "reasoning": "The patient's oxygen saturation is critically low, which can be life-threatening and requires immediate medical attention."
+        }
+      },
+      "insights_generated_at": "2025-08-21T21:13:12.665298"
+    },
+    "files_uploaded": {},
+    "timestamp": "2025-08-21T21:13:12.665646",
+    "data_source": "user_input_and_ai_analysis",
+    "step_completed": true
+  },
+  "step6": {
+    "step_name": "Analysis & Diagnosis",
+    "form_data": {
+      "question_responses_completed": true,
+      "questions_answered": 7,
+      "questions_generated": 10
+    },
+    "ai_generated_data": {
+      "question_responses": {
+        "0": {
+          "question": "When did you first notice your fever?",
+          "category": "onset",
+          "answer_value": "A few days ago",
+          "timestamp": "2025-08-21T15:44:05.498Z"
+        },
+        "1": {
+          "question": "How would you describe the feeling of your fever right now?",
+          "category": "characteristics",
+          "answer_value": "Very hot",
+          "timestamp": "2025-08-21T15:44:06.899Z"
+        },
+        "2": {
+          "question": "How often do you find yourself coughing?",
+          "category": "frequency",
+          "answer_value": "Rarely",
+          "timestamp": "2025-08-21T15:44:08.197Z"
+        },
+        "3": {
+          "question": "What does your cough feel like?",
+          "category": "characteristics",
+          "answer_value": "Productive with mucus",
+          "timestamp": "2025-08-21T15:44:09.847Z"
+        },
+        "4": {
+          "question": "When do you feel most short of breath during the day?",
+          "category": "aggravating",
+          "answer_value": "Evening",
+          "timestamp": "2025-08-21T15:44:10.861Z"
+        },
+        "6": {
+          "question": "Do you find anything that eases your breathing difficulties?",
+          "category": "relieving",
+          "answer_value": "Sitting upright",
+          "timestamp": "2025-08-21T15:44:11.832Z"
+        },
+        "9": {
+          "question": "Have you noticed any changes in your energy levels since your symptoms started?",
+          "category": "overall impact",
+          "answer_value": "Extremely fatigued",
+          "timestamp": "2025-08-21T15:44:14.660Z"
+        }
+      },
+      "original_questions": [
+        {
+          "category": "onset",
+          "options": [
+            "Today",
+            "Yesterday",
+            "A few days ago",
+            "A week ago",
+            "I'm not sure"
+          ],
+          "question": "When did you first notice your fever?",
+          "relevance": "Determining the onset can help identify potential causes or exposures leading to the fever.",
+          "type": "multiple_choice"
+        },
+        {
+          "category": "characteristics",
+          "options": [
+            "Mild warmth",
+            "Moderate heat",
+            "Very hot",
+            "Alternating chills and heat",
+            "I'm not sure"
+          ],
+          "question": "How would you describe the feeling of your fever right now?",
+          "relevance": "Describing the fever can give insights into its intensity and guide further evaluation.",
+          "type": "multiple_choice"
+        },
+        {
+          "category": "frequency",
+          "options": [
+            "Rarely",
+            "A few times a day",
+            "Frequently throughout the day",
+            "All the time",
+            "I'm not sure"
+          ],
+          "question": "How often do you find yourself coughing?",
+          "relevance": "Frequency of coughing can help assess the progression and impact on daily activities.",
+          "type": "multiple_choice"
+        },
+        {
+          "category": "characteristics",
+          "options": [
+            "Dry",
+            "Productive with mucus",
+            "Tickling",
+            "Painful",
+            "I'm not sure"
+          ],
+          "question": "What does your cough feel like?",
+          "relevance": "Understanding the type of cough can help determine if it is due to infection or irritation.",
+          "type": "multiple_choice"
+        },
+        {
+          "category": "aggravating",
+          "options": [
+            "In the morning",
+            "Afternoon",
+            "Evening",
+            "While sleeping",
+            "I'm not sure"
+          ],
+          "question": "When do you feel most short of breath during the day?",
+          "relevance": "Identifying patterns in shortness of breath can help pinpoint triggers and severity of hypoxemia.",
+          "type": "multiple_choice"
+        },
+        {
+          "category": "aggravating",
+          "options": [
+            "Physical activity",
+            "Lying flat",
+            "Exposure to cold air",
+            "Emotional stress",
+            "I'm not sure"
+          ],
+          "question": "What makes your breathing difficulties worse?",
+          "relevance": "Knowing what worsens breathing problems can guide lifestyle adjustments and treatments.",
+          "type": "multiple_choice"
+        },
+        {
+          "category": "relieving",
+          "options": [
+            "Resting",
+            "Sitting upright",
+            "Using a fan",
+            "Using medication",
+            "I'm not sure"
+          ],
+          "question": "Do you find anything that eases your breathing difficulties?",
+          "relevance": "Understanding what provides relief can help manage hypoxemia effectively.",
+          "type": "multiple_choice"
+        },
+        {
+          "category": "severity",
+          "options": [
+            "Mild",
+            "Moderate",
+            "Severe",
+            "Very severe",
+            "I'm not sure"
+          ],
+          "question": "How severe is your difficulty breathing at this moment?",
+          "relevance": "Assessing the severity helps determine the immediate need for medical intervention.",
+          "type": "multiple_choice"
+        },
+        {
+          "category": "aggravating",
+          "options": [
+            "Cold air",
+            "Strong smells",
+            "Physical exertion",
+            "Talking",
+            "I'm not sure"
+          ],
+          "question": "Does anything specific seem to trigger your cough?",
+          "relevance": "Identifying triggers can assist in managing and reducing cough episodes.",
+          "type": "multiple_choice"
+        },
+        {
+          "category": "overall impact",
+          "options": [
+            "No change",
+            "Slightly more tired",
+            "Moderately more tired",
+            "Extremely fatigued",
+            "I'm not sure"
+          ],
+          "question": "Have you noticed any changes in your energy levels since your symptoms started?",
+          "relevance": "Changes in energy levels can indicate the overall impact of the symptoms on daily functioning.",
+          "type": "multiple_choice"
+        }
+      ],
+      "analysis_metadata": {
+        "total_questions_generated": 10,
+        "questions_answered": 7,
+        "completion_timestamp": "2025-08-21T15:44:15.462Z"
+      },
+      "total_questions_generated": 10,
+      "total_questions_answered": 7,
+      "completion_rate": 0.7,
+      "completed_at": "2025-08-21T21:14:15.468129",
+      "session_data": {
+        "questions_generated_from": {
+          "step3_vitals": true,
+          "step4_followups": true,
+          "step5_symptoms": true
+        },
+        "priority_distribution": {
+          "step5_priority": 0.8,
+          "step3_step4_priority": 0.2
+        }
+      },
+      "organized_qa_pairs": [
+        {
+          "question_index": 0,
+          "question_text": "When did you first notice your fever?",
+          "question_category": "onset",
+          "answer": "A few days ago",
+          "answered_at": "2025-08-21T15:44:05.498Z",
+          "original_question_data": {
+            "category": "onset",
+            "options": [
+              "Today",
+              "Yesterday",
+              "A few days ago",
+              "A week ago",
+              "I'm not sure"
+            ],
+            "question": "When did you first notice your fever?",
+            "relevance": "Determining the onset can help identify potential causes or exposures leading to the fever.",
+            "type": "multiple_choice"
+          }
+        },
+        {
+          "question_index": 1,
+          "question_text": "How would you describe the feeling of your fever right now?",
+          "question_category": "characteristics",
+          "answer": "Very hot",
+          "answered_at": "2025-08-21T15:44:06.899Z",
+          "original_question_data": {
+            "category": "characteristics",
+            "options": [
+              "Mild warmth",
+              "Moderate heat",
+              "Very hot",
+              "Alternating chills and heat",
+              "I'm not sure"
+            ],
+            "question": "How would you describe the feeling of your fever right now?",
+            "relevance": "Describing the fever can give insights into its intensity and guide further evaluation.",
+            "type": "multiple_choice"
+          }
+        },
+        {
+          "question_index": 2,
+          "question_text": "How often do you find yourself coughing?",
+          "question_category": "frequency",
+          "answer": "Rarely",
+          "answered_at": "2025-08-21T15:44:08.197Z",
+          "original_question_data": {
+            "category": "frequency",
+            "options": [
+              "Rarely",
+              "A few times a day",
+              "Frequently throughout the day",
+              "All the time",
+              "I'm not sure"
+            ],
+            "question": "How often do you find yourself coughing?",
+            "relevance": "Frequency of coughing can help assess the progression and impact on daily activities.",
+            "type": "multiple_choice"
+          }
+        },
+        {
+          "question_index": 3,
+          "question_text": "What does your cough feel like?",
+          "question_category": "characteristics",
+          "answer": "Productive with mucus",
+          "answered_at": "2025-08-21T15:44:09.847Z",
+          "original_question_data": {
+            "category": "characteristics",
+            "options": [
+              "Dry",
+              "Productive with mucus",
+              "Tickling",
+              "Painful",
+              "I'm not sure"
+            ],
+            "question": "What does your cough feel like?",
+            "relevance": "Understanding the type of cough can help determine if it is due to infection or irritation.",
+            "type": "multiple_choice"
+          }
+        },
+        {
+          "question_index": 4,
+          "question_text": "When do you feel most short of breath during the day?",
+          "question_category": "aggravating",
+          "answer": "Evening",
+          "answered_at": "2025-08-21T15:44:10.861Z",
+          "original_question_data": {
+            "category": "aggravating",
+            "options": [
+              "In the morning",
+              "Afternoon",
+              "Evening",
+              "While sleeping",
+              "I'm not sure"
+            ],
+            "question": "When do you feel most short of breath during the day?",
+            "relevance": "Identifying patterns in shortness of breath can help pinpoint triggers and severity of hypoxemia.",
+            "type": "multiple_choice"
+          }
+        },
+        {
+          "question_index": 6,
+          "question_text": "Do you find anything that eases your breathing difficulties?",
+          "question_category": "relieving",
+          "answer": "Sitting upright",
+          "answered_at": "2025-08-21T15:44:11.832Z",
+          "original_question_data": {
+            "category": "relieving",
+            "options": [
+              "Resting",
+              "Sitting upright",
+              "Using a fan",
+              "Using medication",
+              "I'm not sure"
+            ],
+            "question": "Do you find anything that eases your breathing difficulties?",
+            "relevance": "Understanding what provides relief can help manage hypoxemia effectively.",
+            "type": "multiple_choice"
+          }
+        },
+        {
+          "question_index": 9,
+          "question_text": "Have you noticed any changes in your energy levels since your symptoms started?",
+          "question_category": "overall impact",
+          "answer": "Extremely fatigued",
+          "answered_at": "2025-08-21T15:44:14.660Z",
+          "original_question_data": {
+            "category": "overall impact",
+            "options": [
+              "No change",
+              "Slightly more tired",
+              "Moderately more tired",
+              "Extremely fatigued",
+              "I'm not sure"
+            ],
+            "question": "Have you noticed any changes in your energy levels since your symptoms started?",
+            "relevance": "Changes in energy levels can indicate the overall impact of the symptoms on daily functioning.",
+            "type": "multiple_choice"
+          }
+        }
+      ]
+    },
+    "files_uploaded": {},
+    "timestamp": "2025-08-21T21:14:15.468942",
+    "data_source": "ai_analysis",
+    "step_completed": true
+  },
+  "step7": {},
+  "step_completion_status": {
+    "step1": {
+      "completed": true,
+      "timestamp": "2025-08-21T21:12:15.265202",
+      "form_fields_count": 1,
+      "ai_fields_count": 0,
+      "files_count": 0
+    },
+    "step2": {
+      "completed": true,
+      "timestamp": "2025-08-21T21:12:31.050985",
+      "form_fields_count": 8,
+      "ai_fields_count": 1,
+      "files_count": 1
+    },
+    "step3": {
+      "completed": true,
+      "timestamp": "2025-08-21T21:12:42.448285",
+      "form_fields_count": 6,
+      "ai_fields_count": 0,
+      "files_count": 0
+    },
+    "step4": {
+      "completed": true,
+      "timestamp": "2025-08-21T21:12:51.600181",
+      "form_fields_count": 0,
+      "ai_fields_count": 1,
+      "files_count": 0
+    },
+    "step5": {
+      "completed": true,
+      "timestamp": "2025-08-21T21:13:12.665655",
+      "form_fields_count": 1,
+      "ai_fields_count": 2,
+      "files_count": 0
+    },
+    "step6": {
+      "completed": true,
+      "timestamp": "2025-08-21T21:14:15.468952",
+      "form_fields_count": 3,
+      "ai_fields_count": 9,
+      "files_count": 0
+    }
+  },
+  "step_completed": 6
+}
